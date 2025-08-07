@@ -97,7 +97,6 @@ function generarResumen(hacienda) {
     rankingList.appendChild(li);
   });
 
-  // Tendencia de la hacienda (subida o bajada)
   const cajasOrdenadas = datosHacienda
     .sort((a, b) => parseInt(a.Semana) - parseInt(b.Semana))
     .map(r => +r.Cajas || 0);
