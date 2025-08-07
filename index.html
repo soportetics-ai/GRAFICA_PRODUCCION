@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  
   <div class="sticky-header">
     <select id="haciendaSelector">
       <option value="MARIA">MARIA</option>
@@ -43,7 +44,28 @@
 
   <div id="resumenSection">
     <h2>Resumen de Hacienda: <span id="nombreHaciendaResumen"></span></h2>
-    <p>Conectado a hoja de Google Sheet para resumen.</p>
+
+        <div class="resumen-bloque" id="resumen-mes">
+         <h3>Mes 📅</h3>
+          <p>Mes más productivo: <strong id="mesMasProductivo">--</strong></p>
+          <p>Mes menos productivo: <strong id="mesMenosProductivo">--</strong></p>
+      </div>
+
+        <div class="resumen-bloque" id="resumen-semanas">
+          <h3>Semanas 📦</h3>
+          <p>Semana más productiva: <strong id="semanaMasProductiva">--</strong></p>
+          <p>Semana menos productiva: <strong id="semanaMenosProductiva">--</strong></p>
+        </div>
+
+        <div class="resumen-bloque" id="resumen-ranking">
+          <h3>Posición 🏆</h3>
+          <ol id="rankingFincas"></ol>
+        </div>
+
+<div class="resumen-bloque" id="resumen-tendencia">
+  <h3>Tendencia 📈</h3>
+  <p>Esta hacienda está en <strong id="tendenciaHacienda">--</strong></p>
+</div>
   </div>
 
   <div id="modal"><div id="modal-content"></div></div>
