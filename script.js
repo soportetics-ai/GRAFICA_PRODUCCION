@@ -10,6 +10,7 @@ const cajasCtx = document.getElementById('cajasChart').getContext('2d');
 
 let racimosChart, cajasChart;
 let fullData = [];
+let visibilidadRacimos = {}; // Para guardar estado de visibilidad por dataset
 
 resumenBtn.addEventListener('click', () => {
   const hacienda = haciendaSelector.value;
@@ -208,30 +209,49 @@ function updateCharts(data) {
 
   racimosChart.data.labels = semanas;
 
-  let categoryPercentage = 1, barPercentage = 0.8
-
-  racimosChart.data.datasets = [
+  const datasetsRacimos = [
     {
-      label: 'Racimos Cosechados', data: racimosCosechados, backgroundColor: 'rgba(200,200,200,0.6)',
+      label: 'Racimos Cosechados',
+      data: racimosCosechados,
+      backgroundColor: 'rgba(200,200,200,0.6)',
       borderRadius: 8,
-      categoryPercentage,
-      barPercentage,
-    },
-
-    {
-      label: 'Procesados', data: racimosProcesados, backgroundColor: 'rgba(100,200,100,0.6)',
-      borderRadius: 8,
-      categoryPercentage,
-      barPercentage,
+      categoryPercentage: 1,
+      barPercentage: 0.8,
     },
     {
-      label: 'Rechazados', data: racimosRechazados, backgroundColor: 'rgba(255,99,132,0.6)',
+      label: 'Procesados',
+      data: racimosProcesados,
+      backgroundColor: 'rgba(100,200,100,0.6)',
       borderRadius: 8,
-      categoryPercentage,
-      barPercentage,
+      categoryPercentage: 1,
+      barPercentage: 0.8,
+    },
+    {
+      label: 'Rechazados',
+      data: racimosRechazados,
+      backgroundColor: 'rgba(255,99,132,0.6)',
+      borderRadius: 8,
+      categoryPercentage: 1,
+      barPercentage: 0.8,
     }
   ];
+
+  // Restaurar visibilidad guardada
+  datasetsRacimos.forEach((ds) => {
+    ds.hidden = visibilidadRacimos[ds.label] || false;
+  });
+
+  racimosChart.data.datasets = datasetsRacimos;
   racimosChart.update();
+
+  // Actualizar visibilidad al hacer clic en la leyenda
+  racimosChart.options.plugins.legend.onClick = function(e, legendItem, legend) {
+    const index = legendItem.datasetIndex;
+    const meta = racimosChart.getDatasetMeta(index);
+    meta.hidden = !meta.hidden;
+    visibilidadRacimos[legendItem.text] = meta.hidden;
+    racimosChart.update();
+  };
 
   const cajasTotales = data.map(row => +row['Cajas'] || 0);
   const rathio = data.map(row => +row['Rathio'] || 0);
