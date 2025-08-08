@@ -46,19 +46,50 @@ function semanaAMes(semana) {
   else return 'Desconocido';
 }
 
+const semanasEsperadasPorMes = {
+  'Enero': 5,
+  'Febrero': 4,
+  'Marzo': 4,
+  'Abril': 4,
+  'Mayo': 4,
+  'Junio': 5,
+  'Julio': 4,
+  'Agosto': 5,
+  'Septiembre': 4,
+  'Octubre': 4,
+  'Noviembre': 4,
+  'Diciembre': 5
+};
+
 function generarResumen(hacienda) {
   const datosHacienda = fullData.filter(r =>
     r.Hacienda === hacienda &&
     r['Cajas'] !== undefined && r['Cajas'] !== ''
   );
 
-  // Agrupar cajas por mes
+  // 🔧 AJUSTE: Agrupar por mes con conteo de semanas
   const cajasPorMes = {};
+  const semanasPorMes = {};
+
   datosHacienda.forEach(row => {
     const mes = semanaAMes(row.Semana);
+    const semana = row.Semana;
+
     cajasPorMes[mes] = (cajasPorMes[mes] || 0) + (+row.Cajas || 0);
+    semanasPorMes[mes] = semanasPorMes[mes] || new Set();
+    semanasPorMes[mes].add(semana);
   });
-  const ordenMeses = Object.entries(cajasPorMes).sort((a, b) => b[1] - a[1]);
+
+  // 🔧 AJUSTE: Filtrar solo meses completos
+  const mesesCompletos = Object.entries(semanasPorMes)
+    .filter(([mes, semanas]) => semanas.size >= semanasEsperadasPorMes[mes])
+    .map(([mes]) => mes);
+
+  const cajasMesesFiltrados = Object.fromEntries(
+    Object.entries(cajasPorMes).filter(([mes]) => mesesCompletos.includes(mes))
+  );
+
+  const ordenMeses = Object.entries(cajasMesesFiltrados).sort((a, b) => b[1] - a[1]);
 
   const mesMasProd = ordenMeses[0] || ['--', 0];
   const mesMenosProd = ordenMeses[ordenMeses.length - 1] || ['--', 0];
@@ -77,52 +108,48 @@ function generarResumen(hacienda) {
   document.getElementById("semanaMasProductiva").textContent = `${semanaMasProd.semana} ( ${semanaMasProd.cajas.toLocaleString()} cajas )`;
   document.getElementById("semanaMenosProductiva").textContent = `${semanaMenosProd.semana} ( ${semanaMenosProd.cajas.toLocaleString()} cajas )`;
 
-  // Ranking general de fincas con estilos para destacar actual
-// Paso 1: Hectáreas por finca (valores que me diste)
-// Paso 1: Hectáreas por finca
-const hectareasPorFinca = {
-  "MARIA": 231.59,
-  "PORVENIR": 93.11,
-  "ESPERANZA": 36,
-  "EL CISNE": 13,
-  "VAQUERIA": 61.4,
-  "ESTRELLITA": 16.65,
-  "PRIMAVERA": 67,
-  "AGRO&SOL": 378
-};
+  // Paso 1: Hectáreas por finca
+  const hectareasPorFinca = {
+    "MARIA": 231.59,
+    "PORVENIR": 93.11,
+    "ESPERANZA": 36,
+    "EL CISNE": 13,
+    "VAQUERIA": 61.4,
+    "ESTRELLITA": 16.65,
+    "PRIMAVERA": 67,
+    "AGRO&SOL": 378
+  };
 
-// Paso 2: Número de semanas activas
-const semanasActivas = 30;
+  // Paso 2: Número de semanas activas
+  const semanasActivas = 31;
 
-// Paso 3: Calcular total de cajas por finca
-const cajasPorFinca = {};
-fullData.forEach(row => {
-  if (!row.Cajas || row.Cajas === '') return;
-  cajasPorFinca[row.Hacienda] = (cajasPorFinca[row.Hacienda] || 0) + (+row.Cajas || 0);
-});
+  // Paso 3: Calcular total de cajas por finca
+  const cajasPorFinca = {};
+  fullData.forEach(row => {
+    if (!row.Cajas || row.Cajas === '') return;
+    cajasPorFinca[row.Hacienda] = (cajasPorFinca[row.Hacienda] || 0) + (+row.Cajas || 0);
+  });
 
-// Paso 4: Calcular promedio semanal redondeado
-const ranking = Object.entries(cajasPorFinca)
-  .map(([finca, cajas]) => {
-    const hectareas = hectareasPorFinca[finca] || 1;
-    const promedioSemanal = Math.round((cajas / hectareas) / semanasActivas);
-    return { finca, promedioSemanal };
-  })
-  .sort((a, b) => b.promedioSemanal - a.promedioSemanal);
+  // Paso 4: Calcular promedio semanal redondeado
+  const ranking = Object.entries(cajasPorFinca)
+    .map(([finca, cajas]) => {
+      const hectareas = hectareasPorFinca[finca] || 1;
+      const promedioSemanal = Math.round((cajas / hectareas) / semanasActivas);
+      return { finca, promedioSemanal };
+    })
+    .sort((a, b) => b.promedioSemanal - a.promedioSemanal);
 
-// Paso 5: Mostrar en el DOM
-const rankingList = document.getElementById("rankingFincas");
-rankingList.innerHTML = '';
+  // Paso 5: Mostrar en el DOM
+  const rankingList = document.getElementById("rankingFincas");
+  rankingList.innerHTML = '';
 
-ranking.forEach(({ finca, promedioSemanal }) => {
-  const li = document.createElement('li');
-  li.textContent = `${finca} (${promedioSemanal}) caja x has semanales`;
-  li.style.color = (finca === hacienda) ? '#000000' : '#bbbbbb';
-  li.style.fontWeight = (finca === hacienda) ? 'bold' : 'normal';
-  rankingList.appendChild(li);
-});
-
-
+  ranking.forEach(({ finca, promedioSemanal }) => {
+    const li = document.createElement('li');
+    li.textContent = `${finca} (${promedioSemanal}) caja x has semanales`;
+    li.style.color = (finca === hacienda) ? '#000000' : '#bbbbbb';
+    li.style.fontWeight = (finca === hacienda) ? 'bold' : 'normal';
+    rankingList.appendChild(li);
+  });
 
   const cajasOrdenadas = datosHacienda
     .sort((a, b) => parseInt(a.Semana) - parseInt(b.Semana))
@@ -133,6 +160,7 @@ ranking.forEach(({ finca, promedioSemanal }) => {
     : 'TENDENCIA DE BAJADA 📉';
   document.getElementById("tendenciaHacienda").textContent = tendencia;
 }
+
 
 function createCharts() {
   racimosChart = new Chart(racimosCtx, {
