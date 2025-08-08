@@ -78,25 +78,51 @@ function generarResumen(hacienda) {
   document.getElementById("semanaMenosProductiva").textContent = `${semanaMenosProd.semana} ( ${semanaMenosProd.cajas.toLocaleString()} cajas )`;
 
   // Ranking general de fincas con estilos para destacar actual
-  const cajasPorFinca = {};
-  fullData.forEach(row => {
-    if (!row.Cajas || row.Cajas === '') return;
-    cajasPorFinca[row.Hacienda] = (cajasPorFinca[row.Hacienda] || 0) + (+row.Cajas || 0);
-  });
+// Paso 1: Hectáreas por finca (valores que me diste)
+// Paso 1: Hectáreas por finca
+const hectareasPorFinca = {
+  "MARIA": 231.59,
+  "PORVENIR": 93.11,
+  "ESPERANZA": 36,
+  "EL CISNE": 13,
+  "VAQUERIA": 61.4,
+  "ESTRELLITA": 16.65,
+  "PRIMAVERA": 67,
+  "AGRO&SOL": 378
+};
 
-  const ranking = Object.entries(cajasPorFinca)
-    .sort((a, b) => b[1] - a[1]);
+// Paso 2: Número de semanas activas
+const semanasActivas = 30;
 
-  const rankingList = document.getElementById("rankingFincas");
-  rankingList.innerHTML = '';
+// Paso 3: Calcular total de cajas por finca
+const cajasPorFinca = {};
+fullData.forEach(row => {
+  if (!row.Cajas || row.Cajas === '') return;
+  cajasPorFinca[row.Hacienda] = (cajasPorFinca[row.Hacienda] || 0) + (+row.Cajas || 0);
+});
 
-  ranking.forEach(([finca, cajas]) => {
-    const li = document.createElement('li');
-    li.textContent = finca;
-    li.style.color = (finca === hacienda) ? '#000000' : '#bbbbbb';
-    li.style.fontWeight = (finca === hacienda) ? 'bold' : 'normal';
-    rankingList.appendChild(li);
-  });
+// Paso 4: Calcular promedio semanal redondeado
+const ranking = Object.entries(cajasPorFinca)
+  .map(([finca, cajas]) => {
+    const hectareas = hectareasPorFinca[finca] || 1;
+    const promedioSemanal = Math.round((cajas / hectareas) / semanasActivas);
+    return { finca, promedioSemanal };
+  })
+  .sort((a, b) => b.promedioSemanal - a.promedioSemanal);
+
+// Paso 5: Mostrar en el DOM
+const rankingList = document.getElementById("rankingFincas");
+rankingList.innerHTML = '';
+
+ranking.forEach(({ finca, promedioSemanal }) => {
+  const li = document.createElement('li');
+  li.textContent = `${finca} (${promedioSemanal}) caja x has semanales`;
+  li.style.color = (finca === hacienda) ? '#000000' : '#bbbbbb';
+  li.style.fontWeight = (finca === hacienda) ? 'bold' : 'normal';
+  rankingList.appendChild(li);
+});
+
+
 
   const cajasOrdenadas = datosHacienda
     .sort((a, b) => parseInt(a.Semana) - parseInt(b.Semana))
@@ -236,7 +262,6 @@ function updateCharts(data) {
     }
   ];
 
-  // Restaurar visibilidad guardada
   datasetsRacimos.forEach((ds) => {
     ds.hidden = visibilidadRacimos[ds.label] || false;
   });
@@ -244,7 +269,6 @@ function updateCharts(data) {
   racimosChart.data.datasets = datasetsRacimos;
   racimosChart.update();
 
-  // Actualizar visibilidad al hacer clic en la leyenda
   racimosChart.options.plugins.legend.onClick = function(e, legendItem, legend) {
     const index = legendItem.datasetIndex;
     const meta = racimosChart.getDatasetMeta(index);
