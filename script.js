@@ -10,7 +10,7 @@ const cajasCtx = document.getElementById('cajasChart').getContext('2d');
 
 let racimosChart, cajasChart;
 let fullData = [];
-let visibilidadRacimos = {}; // Para guardar estado de visibilidad por dataset
+let visibilidadRacimos = {};
 
 resumenBtn.addEventListener('click', () => {
   const hacienda = haciendaSelector.value;

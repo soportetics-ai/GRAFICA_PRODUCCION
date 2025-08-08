@@ -54,15 +54,17 @@ canvas { height: 100% !important; }
 }
 
 .magic-wand-btn .magic-label {
-  font-size: 12px;
-  color: #999;
+  font-size: 13px;
+  color: #23242e;
   white-space: nowrap;
+  margin-top: 6px;
 }
 
 .magic-wand-btn img {
   width: 20px;
   height: 20px;
   margin-left: 6px;
+  margin-top: 6px;
 }
 
 #haciendaSelector {
