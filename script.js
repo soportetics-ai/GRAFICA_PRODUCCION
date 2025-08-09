@@ -280,14 +280,41 @@ function updateCharts(data) {
       categoryPercentage: 1,
       barPercentage: 0.8,
     },
-    {
-      label: 'Rechazados',
-      data: racimosRechazados,
-      backgroundColor: 'rgba(255,99,132,0.6)',
-      borderRadius: 8,
-      categoryPercentage: 1,
-      barPercentage: 0.8,
+
+      {
+    label: 'Rechazados',
+    data: racimosRechazados,
+    backgroundColor: 'rgba(255,99,132,0.6)',
+    borderRadius: 8,
+    categoryPercentage: 1,
+    barPercentage: 0.8,
+    datalabels: {
+      labels: {
+        cantidad: {
+          formatter: function(value) {
+            return value;  // solo el número
+          },
+          anchor: 'end',
+          align: 'right',
+          color: 'black',
+          font: { weight: 'bold', size: 12 }
+        },
+        porcentaje: {
+          formatter: function(value, context) {
+            const index = context.dataIndex;
+            const totalCosechados = racimosCosechados[index] || 1;
+            const porcentaje = ((value / totalCosechados) * 100).toFixed(2);
+            return ` (${porcentaje}%)`;
+          },
+          anchor: 'end',
+          align: 'right',
+          color: 'rgba(0,0,0,0.5)',
+          font: { weight: 'normal', size: 11},
+          offset: 25
+        }
+      }
     }
+  }
   ];
 
   datasetsRacimos.forEach((ds) => {
