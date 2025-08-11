@@ -153,3 +153,29 @@ canvas { height: 100% !important; }
 
 
 
+#resumenRacimosRechazados {
+  /* Si está dentro de un .resumen-bloque, no necesita mucho */
+  margin-top: 0;
+  padding-left: 20;
+  max-width: 100%;        /* que tome ancho completo del contenedor */
+  font-size: 14px;        /* igual que resumen-bloque */
+  line-height: 1.5;
+  color: #333333;
+  font-weight: normal;
+}
+
+#resumenRacimosRechazados ul {
+  list-style-position: inside;
+  padding-left: 0;
+  margin: 0;
+}
+
+#resumenRacimosRechazados li {
+  padding: 6px 0;
+  font-size: 14px;
+  color: inherit;
+  font-weight: normal;
+}
+
+
+

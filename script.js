@@ -121,7 +121,7 @@ function generarResumen(hacienda) {
   };
 
   // Paso 2: Número de semanas activas
-  const semanasActivas = 31;
+  const semanasActivas = 32;
 
   // Paso 3: Calcular total de cajas por finca
   const cajasPorFinca = {};
@@ -159,7 +159,96 @@ function generarResumen(hacienda) {
     ? 'TENDENCIA DE SUBIDA 📈'
     : 'TENDENCIA DE BAJADA 📉';
   document.getElementById("tendenciaHacienda").textContent = tendencia;
+
+  const datosRacimos = fullData.filter(r => r.Hacienda === hacienda);
+
+
+
+
+
+     function generarResumenRacimosRechazados(semana = 'Todas') {
+  const selectedHacienda = haciendaSelector.value;
+
+  const haciendasUnicas = [...new Set(fullData
+    .map(r => r.Hacienda)
+    .filter(h => h && h.trim() !== ''))];
+
+  const resumenRechazados = haciendasUnicas.map(hacienda => {
+    let datosHacienda = fullData.filter(r => r.Hacienda === hacienda);
+
+    if (semana !== 'Todas') {
+      datosHacienda = datosHacienda.filter(r => r.Semana === semana);
+    }
+
+    const totalRechazados = datosHacienda.reduce((acc, cur) => acc + (+cur.Rechazados || 0), 0);
+    const totalCosechados = datosHacienda.reduce((acc, cur) => acc + (+cur['Racimos Cosechados'] || 0), 0);
+    const porcentaje = totalCosechados > 0 ? (totalRechazados / totalCosechados) * 100 : 0;
+
+    return {
+      hacienda,
+      totalRechazados,
+      porcentaje
+    };
+  });
+
+  resumenRechazados.sort((a, b) => b.porcentaje - a.porcentaje);
+
+  const ul = document.getElementById('listaRacimosRechazados');
+  ul.innerHTML = '';
+
+  resumenRechazados.forEach(({ hacienda, totalRechazados, porcentaje }, index) => {
+    const li = document.createElement('li');
+    li.textContent = `${hacienda}: ${totalRechazados.toLocaleString()} racimos rechazados (${porcentaje.toFixed(2)}%)`;
+
+    if (hacienda === selectedHacienda) {
+      li.style.color = '#000000';
+      li.style.fontWeight = 'bold';
+    } else {
+      li.style.color = '#bbbbbb';
+      li.style.fontWeight = 'normal';
+    }
+
+    li.style.fontSize = '14px';
+    li.style.padding = '4px 0';
+
+    ul.appendChild(li);
+  });
 }
+
+document.getElementById('filtroSemanaRechazados').addEventListener('change', e => {
+  generarResumenRacimosRechazados(e.target.value);
+});
+
+
+  llenarFiltroSemana();
+ generarResumenRacimosRechazados();
+}
+
+
+
+
+function llenarFiltroSemana() {
+  const select = document.getElementById('filtroSemanaRechazados');
+  // Obtener semanas únicas válidas, filtrando null, undefined y vacíos
+  const semanasUnicas = [...new Set(
+    fullData
+      .map(r => r.Semana)
+      .filter(sem => sem !== null && sem !== undefined && sem.toString().trim() !== '')
+  )].sort((a, b) => parseInt(a) - parseInt(b));
+
+  // Limpiar opciones excepto "Todas"
+  select.querySelectorAll('option:not([value="Todas"])').forEach(opt => opt.remove());
+
+  // Agregar opciones
+  semanasUnicas.forEach(sem => {
+    const option = document.createElement('option');
+    option.value = sem;
+    option.textContent = `Semana ${sem}`;
+    select.appendChild(option);
+  });
+}
+
+
 
 
 function createCharts() {

@@ -50,6 +50,9 @@
     <canvas id="cajasChart"></canvas>
   </div>
 
+
+
+
   <div id="resumenSection">
     <h2>Resumen de Hacienda: <span id="nombreHaciendaResumen"></span></h2>
 
@@ -65,16 +68,40 @@
       <p>Semana menos productiva: <strong id="semanaMenosProductiva">--</strong></p>
     </div>
 
+
+
+
     <div class="resumen-bloque" id="resumen-ranking">
       <h3>Posición 🏆</h3>
       <ol id="rankingFincas"></ol>
     </div>
+
+
+    <label for="filtroSemanaRechazados">Filtrar por semana:</label>
+<select id="filtroSemanaRechazados">
+  <option value="Todas" selected>Todas</option>
+  <!-- Aquí se agregarán opciones dinámicas -->
+</select>
+
+
+
+
+    <div class="resumen-bloque"  id="resumenRacimosRechazados">
+     <h3>Racimos Rechazados por Hacienda 🚯</h3>
+     <ol id="listaRacimosRechazados"></ol>
+    </div>
+
+    
+
+
 
     <div class="resumen-bloque" id="resumen-tendencia">
       <h3>Tendencia 📈</h3>
       <p>Esta hacienda está en <strong id="tendenciaHacienda">--</strong></p>
     </div>
   </div>
+
+
 
   <div id="modal"><div id="modal-content"></div></div>
 
