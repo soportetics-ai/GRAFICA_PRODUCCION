@@ -4,97 +4,86 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Producción por Hacienda</title>
-
   <link rel="icon" href="img/favicon.png">
-
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-
   <link rel="stylesheet" href="styles.css" />
-
 </head>
-<body>
-  
-  <div class="sticky-header">
 
+<body>
+
+<!-- 𝄜 ENCABEZADOS ( FILTRO-HACIENDA /  RESUMEN  /  RACIMOS   / CAJAS ) -->  
+  <div class="sticky-header">
     <div style="display: flex; align-items: center; gap: 8px;">
-      <select id="haciendaSelector">
-        <option value="MARIA">MARIA</option>
-        <option value="PORVENIR">PORVENIR</option>
-        <option value="ESPERANZA">ESPERANZA</option>
-        <option value="EL CISNE">EL CISNE</option>
-        <option value="VAQUERIA">VAQUERIA</option>
-        <option value="ESTRELLITA">ESTRELLITA</option>
-        <option value="PRIMAVERA">PRIMAVERA</option>
-        <option value="AGRO&SOL">AGRO&SOL</option>
-      </select>
+          <select id="haciendaSelector">
+              <option value="MARIA">MARIA</option>
+              <option value="PORVENIR">PORVENIR</option>
+              <option value="ESPERANZA">ESPERANZA</option>
+              <option value="EL CISNE">EL CISNE</option>
+              <option value="VAQUERIA">VAQUERIA</option>
+              <option value="ESTRELLITA">ESTRELLITA</option>
+              <option value="PRIMAVERA">PRIMAVERA</option>
+              <option value="AGRO&SOL">AGRO&SOL</option>
+          </select>
       <span style="font-size: 0.60rem; color: #bba356; font-weight: bold">beta </span>
     </div>
-
     <button class="magic-wand-btn" id="resumenBtn" title="Generar Resumen Inteligente" aria-label="Generar Resumen Inteligente">
       <span class="magic-label">Resumen</span>
       <img src="img/varita-magica.png" alt="Varita" />
     </button>
-
     <div class="tabs">
       <div class="tab active" data-tab="racimos">RACIMOS 🍌</div>
       <div class="tab" data-tab="cajas">CAJAS 📦</div>
     </div>
   </div>
 
+
+<!-- CHARS PARA RACIMOS Y CAJAS    🍌 | 📦-->  
   <div id="racimos" class="tab-content active" style="height: 1500px;">
     <canvas id="racimosChart" > </canvas>
   </div>
-
   <div id="cajas" class="tab-content">
     <canvas id="cajasChart"></canvas>
   </div>
 
 
 
-
+<!-- SUB-ENCABEZADO PARA MODULO DE RESUMEN ✨  /  BLOQUE MES Y SEMANA MAS PRODUCTIVA 📅 📦--> 
   <div id="resumenSection">
     <h2>Resumen de Hacienda: <span id="nombreHaciendaResumen"></span></h2>
-
     <div class="resumen-bloque" id="resumen-mes">
       <h3>Mes 📅</h3>
       <p>Mes más productivo: <strong id="mesMasProductivo">--</strong></p>
       <p>Mes menos productivo: <strong id="mesMenosProductivo">--</strong></p>
     </div>
-
     <div class="resumen-bloque" id="resumen-semanas">
       <h3>Semanas 📦</h3>
       <p>Semana más productiva: <strong id="semanaMasProductiva">--</strong></p>
       <p>Semana menos productiva: <strong id="semanaMenosProductiva">--</strong></p>
     </div>
 
-
-
-
+<!-- PARAMETROS PARA FILTRO DE BLOQUE POSICION 🏆--> 
+    <label for="filtroSemanaPosicion">Filtrar por semana:</label>
+     <select id="filtroSemanaPosicion">
+       <option value="Todas" selected>Todas</option> 
+     </select> 
     <div class="resumen-bloque" id="resumen-ranking">
       <h3>Posición 🏆</h3>
       <ol id="rankingFincas"></ol>
     </div>
 
-
+<!-- PARAMETROS PARA FILTRO DE RECHAZOS 🚯--> 
     <label for="filtroSemanaRechazados">Filtrar por semana:</label>
-<select id="filtroSemanaRechazados">
-  <option value="Todas" selected>Todas</option>
-  <!-- Aquí se agregarán opciones dinámicas -->
-</select>
-
-
-
-
+     <select id="filtroSemanaRechazados">
+       <option value="Todas" selected>Todas</option>
+     </select>
     <div class="resumen-bloque"  id="resumenRacimosRechazados">
      <h3>Racimos Rechazados por Hacienda 🚯</h3>
      <ol id="listaRacimosRechazados"></ol>
     </div>
 
     
-
-
-
+<!-- PARAMETROS PARA RESUMEN DE TENDENCIA 📈-->
     <div class="resumen-bloque" id="resumen-tendencia">
       <h3>Tendencia 📈</h3>
       <p>Esta hacienda está en <strong id="tendenciaHacienda">--</strong></p>
@@ -104,9 +93,11 @@
 
 
   <div id="modal"><div id="modal-content"></div></div>
-
   <script src="script.js"></script>
+  
 </body>
 </html>
+
+
 
 

@@ -4,10 +4,8 @@ const haciendaSelector = document.getElementById('haciendaSelector');
 const resumenBtn = document.getElementById('resumenBtn');
 const resumenSection = document.getElementById('resumenSection');
 const nombreHaciendaResumen = document.getElementById('nombreHaciendaResumen');
-
 const racimosCtx = document.getElementById('racimosChart').getContext('2d');
 const cajasCtx = document.getElementById('cajasChart').getContext('2d');
-
 let racimosChart, cajasChart;
 let fullData = [];
 let visibilidadRacimos = {};
@@ -15,20 +13,16 @@ let visibilidadRacimos = {};
 resumenBtn.addEventListener('click', () => {
   const hacienda = haciendaSelector.value;
   const magicLoader = document.getElementById('magic-loader');
-
   if (magicLoader) magicLoader.classList.remove('hidden');
-
   setTimeout(() => {
     if (magicLoader) magicLoader.classList.add('hidden');
-
     nombreHaciendaResumen.textContent = hacienda;
     document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
     resumenSection.style.display = 'block';
-
-    generarResumen(hacienda);
-  }, 1500);
+    generarResumen(hacienda);}, 1500);
 });
 
+// PARAMETROS ( LYDAS )***********
 function semanaAMes(semana) {
   const sem = parseInt(semana, 10);
   if (sem >= 1 && sem <= 5) return 'Enero';
@@ -45,7 +39,6 @@ function semanaAMes(semana) {
   else if (sem >= 48 && sem <= 52) return 'Diciembre';
   else return 'Desconocido';
 }
-
 const semanasEsperadasPorMes = {
   'Enero': 5,
   'Febrero': 4,
@@ -61,54 +54,78 @@ const semanasEsperadasPorMes = {
   'Diciembre': 5
 };
 
-function generarResumen(hacienda) {
-  const datosHacienda = fullData.filter(r =>
-    r.Hacienda === hacienda &&
-    r['Cajas'] !== undefined && r['Cajas'] !== ''
-  );
 
-  // 🔧 AJUSTE: Agrupar por mes con conteo de semanas
+
+
+
+// GENERA RESUMEN DE MES Y SEMANA MAS PRODUCTIVOS 📅📦***********
+function generarResumen(hacienda, semana = 'Todas') {
+  let datosHacienda = fullData.filter(r =>
+    r.Hacienda === hacienda &&
+    r['Cajas'] !== undefined &&
+    r['Cajas'] !== '');
+    if (semana !== 'Todas') {
+    datosHacienda = datosHacienda.filter(r => r.Semana === semana);}
+  const totalCajasGlobalAll = fullData.reduce((acc, r) => acc + (+r.Cajas || 0), 0);
+  const totalCajasFiltro = (semana === 'Todas')
+  ? totalCajasGlobalAll  : fullData.filter(r => r.Semana === semana).reduce((acc, r) => acc + (+r.Cajas || 0), 0);
+  const elGlobal = document.getElementById('totalCajasGlobal');
+    if (elGlobal) elGlobal.textContent = totalCajasGlobalAll.toLocaleString();
+  const elSemana = document.getElementById('totalCajasSemana');
+    if (elSemana) elSemana.textContent = totalCajasFiltro.toLocaleString();
   const cajasPorMes = {};
   const semanasPorMes = {};
-
   datosHacienda.forEach(row => {
     const mes = semanaAMes(row.Semana);
-    const semana = row.Semana;
-
+    const semanaRow = row.Semana;
     cajasPorMes[mes] = (cajasPorMes[mes] || 0) + (+row.Cajas || 0);
     semanasPorMes[mes] = semanasPorMes[mes] || new Set();
-    semanasPorMes[mes].add(semana);
-  });
-
-  // 🔧 AJUSTE: Filtrar solo meses completos
+    semanasPorMes[mes].add(semanaRow);});  
   const mesesCompletos = Object.entries(semanasPorMes)
     .filter(([mes, semanas]) => semanas.size >= semanasEsperadasPorMes[mes])
     .map(([mes]) => mes);
-
   const cajasMesesFiltrados = Object.fromEntries(
-    Object.entries(cajasPorMes).filter(([mes]) => mesesCompletos.includes(mes))
-  );
-
+    Object.entries(cajasPorMes).filter(([mes]) => mesesCompletos.includes(mes)));
   const ordenMeses = Object.entries(cajasMesesFiltrados).sort((a, b) => b[1] - a[1]);
-
   const mesMasProd = ordenMeses[0] || ['--', 0];
   const mesMenosProd = ordenMeses[ordenMeses.length - 1] || ['--', 0];
-
   document.getElementById("mesMasProductivo").textContent = `${mesMasProd[0]} ( ${mesMasProd[1].toLocaleString()} cajas )`;
   document.getElementById("mesMenosProductivo").textContent = `${mesMenosProd[0]} ( ${mesMenosProd[1].toLocaleString()} cajas )`;
-
-  // Semanas más y menos productivas con cantidad
   const ordenSemanas = datosHacienda
     .map(row => ({ semana: row.Semana, cajas: +row.Cajas || 0 }))
     .sort((a, b) => b.cajas - a.cajas);
-
   const semanaMasProd = ordenSemanas[0] || { semana: '--', cajas: 0 };
   const semanaMenosProd = ordenSemanas[ordenSemanas.length - 1] || { semana: '--', cajas: 0 };
-
   document.getElementById("semanaMasProductiva").textContent = `${semanaMasProd.semana} ( ${semanaMasProd.cajas.toLocaleString()} cajas )`;
   document.getElementById("semanaMenosProductiva").textContent = `${semanaMenosProd.semana} ( ${semanaMenosProd.cajas.toLocaleString()} cajas )`;
 
-  // Paso 1: Hectáreas por finca
+
+
+
+  // GENERA RESUMEN DE TENDECIA ULTIMA (-) PENULTIMA CAJA***********
+  const cajasOrdenadas = datosHacienda
+  .sort((a, b) => parseInt(a.Semana) - parseInt(b.Semana))
+  .map(r => +r.Cajas || 0);
+const len = cajasOrdenadas.length;
+if (len >= 2) {
+  const penultima = cajasOrdenadas[len - 2];
+  const ultima = cajasOrdenadas[len - 1];
+  const tendencia = penultima < ultima
+    ? 'TENDENCIA DE SUBIDA 📈'
+    : 'TENDENCIA DE BAJADA 📉';
+  document.getElementById("tendenciaHacienda").textContent = tendencia;} else {
+  document.getElementById("tendenciaHacienda").textContent = 'Datos insuficientes para tendencia';}
+
+
+
+
+
+
+
+// GENERA RESUMEN DE POSICION 🏆***********  
+  function generarResumenPosicion(semana = 'Todas') {
+  const selectedHacienda = haciendaSelector.value;
+  const haciendasUnicas = [...new Set(fullData.map(r => r.Hacienda).filter(h => h && h.trim() !== ''))];
   const hectareasPorFinca = {
     "MARIA": 231.59,
     "PORVENIR": 93.11,
@@ -119,127 +136,109 @@ function generarResumen(hacienda) {
     "PRIMAVERA": 67,
     "AGRO&SOL": 378
   };
-
-  // Paso 2: Número de semanas activas
-  const semanasActivas = 32;
-
-  // Paso 3: Calcular total de cajas por finca
-  const cajasPorFinca = {};
-  fullData.forEach(row => {
-    if (!row.Cajas || row.Cajas === '') return;
-    cajasPorFinca[row.Hacienda] = (cajasPorFinca[row.Hacienda] || 0) + (+row.Cajas || 0);
-  });
-
-  // Paso 4: Calcular promedio semanal redondeado
-  const ranking = Object.entries(cajasPorFinca)
-    .map(([finca, cajas]) => {
-      const hectareas = hectareasPorFinca[finca] || 1;
-      const promedioSemanal = Math.round((cajas / hectareas) / semanasActivas);
-      return { finca, promedioSemanal };
-    })
-    .sort((a, b) => b.promedioSemanal - a.promedioSemanal);
-
-  // Paso 5: Mostrar en el DOM
+  const resumenPosicion = haciendasUnicas.map(hacienda => {
+    let datosHacienda = fullData.filter(r => r.Hacienda === hacienda);
+    if (semana !== 'Todas') {
+      datosHacienda = datosHacienda.filter(r => r.Semana === semana);}
+    const totalCajas = datosHacienda.reduce((acc, cur) => acc + (+cur.Cajas || 0), 0);
+    const semanasActivasSet = new Set(datosHacienda.map(r => r.Semana));
+    const semanasActivas = semanasActivasSet.size || 1;
+    const hectareas = hectareasPorFinca[hacienda] || 1;
+    const divisorSemanas = (semana === 'Todas') ? semanasActivas : 1;
+    const promedioSemanal = ((totalCajas / hectareas) / divisorSemanas).toFixed(2);
+    return { hacienda, promedioSemanal };});
+  resumenPosicion.sort((a, b) => b.promedioSemanal - a.promedioSemanal);
   const rankingList = document.getElementById("rankingFincas");
   rankingList.innerHTML = '';
-
-  ranking.forEach(({ finca, promedioSemanal }) => {
+  resumenPosicion.forEach(({ hacienda, promedioSemanal }) => {
     const li = document.createElement('li');
-    li.textContent = `${finca} (${promedioSemanal}) caja x has semanales`;
-    li.style.color = (finca === hacienda) ? '#000000' : '#bbbbbb';
-    li.style.fontWeight = (finca === hacienda) ? 'bold' : 'normal';
-    rankingList.appendChild(li);
-  });
-
-  const cajasOrdenadas = datosHacienda
-    .sort((a, b) => parseInt(a.Semana) - parseInt(b.Semana))
-    .map(r => +r.Cajas || 0);
-
-  const tendencia = cajasOrdenadas[0] < cajasOrdenadas[cajasOrdenadas.length - 1]
-    ? 'TENDENCIA DE SUBIDA 📈'
-    : 'TENDENCIA DE BAJADA 📉';
-  document.getElementById("tendenciaHacienda").textContent = tendencia;
-
-  const datosRacimos = fullData.filter(r => r.Hacienda === hacienda);
-
-
-
-
-
-     function generarResumenRacimosRechazados(semana = 'Todas') {
-  const selectedHacienda = haciendaSelector.value;
-
-  const haciendasUnicas = [...new Set(fullData
-    .map(r => r.Hacienda)
-    .filter(h => h && h.trim() !== ''))];
-
-  const resumenRechazados = haciendasUnicas.map(hacienda => {
-    let datosHacienda = fullData.filter(r => r.Hacienda === hacienda);
-
-    if (semana !== 'Todas') {
-      datosHacienda = datosHacienda.filter(r => r.Semana === semana);
-    }
-
-    const totalRechazados = datosHacienda.reduce((acc, cur) => acc + (+cur.Rechazados || 0), 0);
-    const totalCosechados = datosHacienda.reduce((acc, cur) => acc + (+cur['Racimos Cosechados'] || 0), 0);
-    const porcentaje = totalCosechados > 0 ? (totalRechazados / totalCosechados) * 100 : 0;
-
-    return {
-      hacienda,
-      totalRechazados,
-      porcentaje
-    };
-  });
-
-  resumenRechazados.sort((a, b) => b.porcentaje - a.porcentaje);
-
-  const ul = document.getElementById('listaRacimosRechazados');
-  ul.innerHTML = '';
-
-  resumenRechazados.forEach(({ hacienda, totalRechazados, porcentaje }, index) => {
-    const li = document.createElement('li');
-    li.textContent = `${hacienda}: ${totalRechazados.toLocaleString()} racimos rechazados (${porcentaje.toFixed(2)}%)`;
-
-    if (hacienda === selectedHacienda) {
-      li.style.color = '#000000';
-      li.style.fontWeight = 'bold';
+    li.textContent = `${hacienda} (${promedioSemanal}) caja x has semanales`;
+    if (hacienda === selectedHacienda) {li.style.color = '#000000';li.style.fontWeight = 'bold';
     } else {
-      li.style.color = '#bbbbbb';
-      li.style.fontWeight = 'normal';
+    li.style.color = '#bbbbbb';li.style.fontWeight = 'normal';
     }
-
-    li.style.fontSize = '14px';
-    li.style.padding = '4px 0';
-
-    ul.appendChild(li);
-  });
-}
-
-document.getElementById('filtroSemanaRechazados').addEventListener('change', e => {
-  generarResumenRacimosRechazados(e.target.value);
+    li.style.fontSize = '14px';li.style.padding = '4px 0';
+    rankingList.appendChild(li);
+  });}
+document.getElementById('filtroSemanaPosicion').addEventListener('change', e => {generarResumenPosicion(e.target.value);
 });
-
-
-  llenarFiltroSemana();
- generarResumenRacimosRechazados();
-}
-
-
-
-
-function llenarFiltroSemana() {
-  const select = document.getElementById('filtroSemanaRechazados');
-  // Obtener semanas únicas válidas, filtrando null, undefined y vacíos
+function llenarFiltroSemanaPosicion() {
+  const select = document.getElementById('filtroSemanaPosicion');
   const semanasUnicas = [...new Set(
     fullData
       .map(r => r.Semana)
       .filter(sem => sem !== null && sem !== undefined && sem.toString().trim() !== '')
   )].sort((a, b) => parseInt(a) - parseInt(b));
-
-  // Limpiar opciones excepto "Todas"
   select.querySelectorAll('option:not([value="Todas"])').forEach(opt => opt.remove());
+  semanasUnicas.forEach(sem => {
+    const option = document.createElement('option');
+    option.value = sem;
+    option.textContent = `Semana ${sem}`;
+    select.appendChild(option);
+  });
+}
+llenarFiltroSemanaPosicion();
+generarResumenPosicion('Todas');
 
-  // Agregar opciones
+ 
+
+
+// GENERA RESUMEN DE REHAZOS 🚯***********
+  function generarResumenRacimosRechazados(semana = 'Todas') {
+    const selectedHacienda = haciendaSelector.value;
+    const haciendasUnicas = [...new Set(fullData.map(r => r.Hacienda).filter(h => h && h.trim() !== ''))];
+    const resumenRechazados = haciendasUnicas.map(hacienda => {
+      let datosHacienda = fullData.filter(r => r.Hacienda === hacienda);
+          if (semana !== 'Todas') {
+      datosHacienda = datosHacienda.filter(r => r.Semana === semana);}
+    const totalRechazados = datosHacienda.reduce((acc, cur) => acc + (+cur.Rechazados || 0), 0);
+    const totalCosechados = datosHacienda.reduce((acc, cur) => acc + (+cur['Racimos Cosechados'] || 0), 0);
+    const porcentaje = totalCosechados > 0 ? (totalRechazados / totalCosechados) * 100 : 0;
+    return {hacienda,totalRechazados,porcentaje};});
+  resumenRechazados.sort((a, b) => b.porcentaje - a.porcentaje);
+  const ul = document.getElementById('listaRacimosRechazados');
+  ul.innerHTML = '';
+  resumenRechazados.forEach(({ hacienda, totalRechazados, porcentaje }, index) => {
+    const li = document.createElement('li');
+    li.textContent = `${hacienda}: ${totalRechazados.toLocaleString()} racimos rechazados (${porcentaje.toFixed(2)}%)`;
+    if (hacienda === selectedHacienda) {
+      li.style.color = '#000000';li.style.fontWeight = 'bold';} else {li.style.color = '#bbbbbb';li.style.fontWeight = 'normal'; }li.style.fontSize = '14px';li.style.padding = '4px 0';ul.appendChild(li);
+  });}
+  document.
+  getElementById('filtroSemanaRechazados').addEventListener('change', e => {
+  generarResumenRacimosRechazados(e.target.value);});
+  llenarFiltroSemana();
+  generarResumenRacimosRechazados();}
+
+
+  
+
+
+
+
+// 🌪️ FILTRO PARA RECHASOS***********   
+function llenarFiltroSemana() {
+  const select = document.getElementById('filtroSemanaRechazados');
+  const semanasUnicas = [...new Set(
+    fullData.map(r => r.Semana).filter(sem => sem !== null && sem !== undefined && sem.toString().trim() !== ''))].sort((a, b) => parseInt(a) - parseInt(b));
+  select.querySelectorAll('option:not([value="Todas"])').forEach(opt => opt.remove());
+  semanasUnicas.forEach(sem => {
+    const option = document.createElement('option');
+    option.value = sem;
+    option.textContent = `Semana ${sem}`;
+  select.appendChild(option);
+  });
+}
+
+
+
+
+// 🌪️ FILTRO PARA POSICION*********** 
+function llenarFiltroSemanaPosicion() {
+  const select = document.getElementById('filtroSemanaPosicion');
+  const semanasUnicas = [...new Set(
+    fullData.map(r => r.Semana).filter(sem => sem !== null && sem !== undefined && sem.toString().trim() !== ''))].sort((a,b) => parseInt(a) - parseInt(b));
+  select.querySelectorAll('option:not([value="Todas"])').forEach(opt => opt.remove());
   semanasUnicas.forEach(sem => {
     const option = document.createElement('option');
     option.value = sem;
@@ -251,6 +250,17 @@ function llenarFiltroSemana() {
 
 
 
+
+
+
+
+
+
+
+
+
+
+// 📊 *********** SCRIPT CHART ( GRAFICO DE BARRAS ) 📊*********** 
 function createCharts() {
   racimosChart = new Chart(racimosCtx, {
     type: 'bar',
@@ -476,3 +486,4 @@ document.getElementById('modal').addEventListener('click', () => {
 
 createCharts();
 fetchAndRender();
+
