@@ -550,3 +550,14 @@ document.getElementById('modal').addEventListener('click', () => {
 
 createCharts();
 fetchAndRender();
+
+document.addEventListener('DOMContentLoaded', () => {
+  resumenSection.style.display = 'none';
+  const tabInicial = 'racimos';
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.classList.toggle('active', tab.getAttribute('data-tab') === tabInicial);
+  });
+  document.querySelectorAll('.tab-content').forEach(content => {
+    content.style.display = (content.id === tabInicial) ? 'block' : 'none';
+  });
+});

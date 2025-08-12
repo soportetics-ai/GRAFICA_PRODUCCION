@@ -1,3 +1,4 @@
+
 body { font-family: sans-serif; margin: 0; padding: 0; }
 
 .sticky-header { 
@@ -10,9 +11,24 @@ body { font-family: sans-serif; margin: 0; padding: 0; }
   border-bottom: 1px solid #ccc;
 }
 
-.tabs { display: flex; margin-top: 10px; border-bottom: 1px solid #ccc; }
-.tab { flex: 1; padding: 10px; text-align: center; cursor: pointer; }
-.tab.active { font-weight: bold; background-color: #f0f0f0; }
+.tabs { 
+  display: flex; 
+  margin-top: 10px; 
+  border-bottom: 1px solid #ccc; 
+}
+
+.tab { 
+  flex: 1; 
+  padding: 10px; 
+  text-align: center; 
+  cursor: pointer; 
+}
+
+.tab.active { 
+  font-weight: bold; 
+  background-color: #f0f0f0; 
+}
+
 .tab-content { 
   display: none; 
   padding: 20px; 
@@ -20,7 +36,10 @@ body { font-family: sans-serif; margin: 0; padding: 0; }
   height: 800px; 
   box-sizing: border-box;
 }
-.tab-content.active { display: block; }
+
+.tab-content.active { 
+  display: block; 
+}
 
 #modal { 
   display: none; 
