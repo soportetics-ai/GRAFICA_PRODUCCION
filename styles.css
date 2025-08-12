@@ -384,17 +384,25 @@ canvas { height: 100% !important; }
   font-size: 15px;
   background: linear-gradient(
     90deg,
+    #2c2514,
+    #4a3c19,
+    #634e1d,
+    #a27c23,
+    #692b10,
     #c95b2b,
     #8a3f1f,
     #6600ff,
     #3d2fac,
-    #507df9
+    #507df9,
+    #4a66b2,
+    #3a4562,
+    #272e41
   );
   background-size: 400% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  animation: gradientMove 6s linear infinite;
+  animation: gradientMove 20s linear infinite;
 }
 
 @keyframes gradientMove {
