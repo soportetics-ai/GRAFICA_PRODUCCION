@@ -82,7 +82,15 @@ canvas { height: 100% !important; }
   margin-top: 6px;
 }
 
+@keyframes swing {
+  0%   { transform: rotate(0deg); }
+  25%  { transform: rotate(10deg); }
+  50%  { transform: rotate(0deg); }
+  75%  { transform: rotate(-10deg); }
+  100% { transform: rotate(0deg); }
+}
 .magic-wand-btn img {
+  animation: swing 3s ease-in-out infinite;
   width: 20px;
   height: 20px;
   margin-left: 6px;
@@ -368,4 +376,32 @@ canvas { height: 100% !important; }
   border: none !important;
   box-shadow: none !important; /* si también tiene sombra negra que parece borde */
   background: transparent !important; /* para asegurarte que fondo no genere efecto */
+}
+
+
+.resumen-animado {
+  font-weight: 700;
+  font-size: 15px;
+  background: linear-gradient(
+    90deg,
+    #c95b2b,
+    #8a3f1f,
+    #6600ff,
+    #3d2fac,
+    #507df9
+  );
+  background-size: 400% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: gradientMove 6s linear infinite;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 400% 0%;
+  }
 }

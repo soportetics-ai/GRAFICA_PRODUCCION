@@ -28,7 +28,7 @@
       <span style="font-size: 0.60rem; color: #bba356; font-weight: bold">beta </span>
     </div>
     <button class="magic-wand-btn" id="resumenBtn" title="Generar Resumen Inteligente" aria-label="Generar Resumen Inteligente">
-      <span class="magic-label">Resumen</span>
+      <span class="resumen-animado">Resumen</span>
       <img src="img/varita-magica.png" alt="Varita" />
     </button>
     <div class="tabs">
@@ -65,17 +65,17 @@
 
   <!-- PARAMETROS PARA BLOQUE CAJAS 📦 --> 
     <label for="filtroSemanaCajas">Filtrar por semana:</label>
-<select id="filtroSemanaCajas">
-  <option value="Todas" selected>Todas</option> 
-</select> 
-
-<div class="resumen-bloque" id="resumen-cajas">
-  <h3>Cajas 📦</h3>
-  <div class="contenedor-cajas-flex" style="display: flex; gap: 20px; align-items: flex-start;">
-    <ol id="cajasFincas" style="max-width: 300px; overflow-y: auto; border-right: 1px solid #ccc; padding-right: 10px;"></ol>
-    <div id="tablaResumen" class="tabla-resumen" style="max-width: 250px; width: max-content; border: 1px solid black; padding: 5px; font-size: 13px; word-wrap: break-word; box-sizing: border-box;"></div>
-  </div>
-</div>
+    <select id="filtroSemanaCajas">
+      <option value="Todas" selected>Todas</option>
+    </select>
+    
+    <div class="resumen-bloque" id="resumen-cajas">
+      <h3>Cajas 📦</h3>
+      <div class="contenedor-cajas-flex">
+        <ol id="cajasFincas"></ol>
+        <div id="tablaResumen" class="tabla-resumen"></div>
+      </div>
+    </div>
 
 
 
