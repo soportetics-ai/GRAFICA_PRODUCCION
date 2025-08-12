@@ -31,6 +31,7 @@ resumenBtn.addEventListener('click', () => {
     nombreHaciendaResumen.textContent = hacienda;
     document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
     resumenSection.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     generarResumen(hacienda);
   }, 1500);
 });;
