@@ -508,14 +508,25 @@ function updateCharts(data) {
 
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
-    resumenSection.style.display = 'none';
+    // Ocultar tooltip custom de Chart.js si existe
+    const tooltipEl = document.getElementById('chartjs-tooltip');
+    if (tooltipEl) {
+      tooltipEl.style.opacity = 0;
+      tooltipEl.style.left = '-9999px';  // Moverlo fuera de pantalla
+      tooltipEl.style.top = '-9999px';
+    }
 
+    // Ocultar resumen y tabs como ya tienes
+    resumenSection.style.display = 'none';
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
 
     tab.classList.add('active');
     const targetId = tab.getAttribute('data-tab');
     document.getElementById(targetId).style.display = 'block';
+
+    // Scroll al tope de la página o del contenedor
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 });
 
