@@ -1,5 +1,5 @@
 const apiUrl = 'https://api.sheetbest.com/sheets/1655a791-4d3c-412f-961e-c2d306e7ea4b';
-const apiResumenUrl = 'https://api.sheetbest.com/sheets/9e5e9097-2429-4223-913c-e507e483458d'; 
+const apiResumenUrl = 'https://api.sheetbest.com/sheets/7e12e770-3dc8-4f6f-adec-179259dfc410'; 
 const haciendaSelector = document.getElementById('haciendaSelector');
 const resumenBtn = document.getElementById('resumenBtn');
 const resumenSection = document.getElementById('resumenSection');
@@ -9,6 +9,25 @@ const cajasCtx = document.getElementById('cajasChart').getContext('2d');
 let racimosChart, cajasChart;
 let fullData = [];
 let visibilidadRacimos = {};
+
+// --- NUEVO: datos del endpoint de Racimos Cosechados (para tooltips)
+// Variable global que almacenará la tabla del apiResumenUrl
+let datosCosechados = [];
+
+// Función para cargar datos desde apiResumenUrl
+function cargarCosechados() {
+  fetch(apiResumenUrl)
+    .then(res => res.json())
+    .then(data => {
+      datosCosechados = Array.isArray(data) ? data : [];
+    })
+    .catch(err => {
+      console.error("Error cargando datos de racimos cosechados:", err);
+      datosCosechados = [];
+    });
+}
+
+// --- fin NUEVO
 
 resumenBtn.addEventListener('click', () => {
   const hacienda = haciendaSelector.value;
@@ -67,9 +86,6 @@ const semanasEsperadasPorMes = {
   'Noviembre': 4,
   'Diciembre': 5
 };
-
-
-
 
 
 // GENERA RESUMEN DE MES Y SEMANA MAS PRODUCTIVOS 📅📦***********
@@ -388,6 +404,7 @@ function createCharts() {
           tooltipEl.style.top = '0px';  
           tooltipEl.innerHTML = '';  
 
+          // --- mantenemos tu lógica original para obtener punto/dataset/semana/valor
           const dataIndex = tooltipModel.dataPoints[0].dataIndex;
           const datasetLabel = tooltipModel.dataPoints[0].dataset.label;
           const value = tooltipModel.dataPoints[0].parsed.x;
@@ -396,6 +413,7 @@ function createCharts() {
 
           const container = document.createElement('div');
 
+          // --- caso: Rechazados (tu lógica original)
           if (datasetLabel === 'Rechazados') {
             const filasCausas = fullData.filter(r =>
               r.Hacienda === hacienda &&
@@ -460,6 +478,129 @@ function createCharts() {
                 container.appendChild(causaLine);
               });
             }
+
+
+
+
+          // --- NUEVO: caso Racimos Cosechados -> mostrar detalle por edades desde datosCosechados
+          } else if (datasetLabel === 'Racimos Cosechados') {
+  const mainLine = document.createElement('div');
+  mainLine.style.display = 'flex';
+  mainLine.style.alignItems = 'center';
+  mainLine.style.fontWeight = 'bold';
+  mainLine.style.color = '#ffffff';
+  mainLine.style.marginBottom = '6px';
+
+  const colorBox = document.createElement('span');
+  colorBox.style.display = 'inline-block';
+  colorBox.style.width = '12px';
+  colorBox.style.height = '12px';
+  colorBox.style.backgroundColor = 'rgba(200,200,200,0.8)';
+  colorBox.style.marginRight = '8px';
+  colorBox.style.borderRadius = '2px';
+
+  mainLine.appendChild(colorBox);
+  mainLine.appendChild(document.createTextNode(`${datasetLabel}: ${value}`));
+  container.appendChild(mainLine);
+
+  // Función para obtener colores base ordenados por edad (de sem01)
+  const coloresBase = [
+    { edad: 8, color: 'black' },
+    { edad: 9, color: 'white' },
+    { edad: 10, color: 'blue' },
+    { edad: 11, color: 'green' },
+    { edad: 12, color: 'yellow' },
+    { edad: 13, color: 'brown' },
+    { edad: 14, color: 'red' },
+    { edad: 15, color: 'purple' }
+  ];
+
+  // Calculamos el desplazamiento de colores según la semana (8 semanas: 8 a 15)
+  // Extraemos el número de la semana (como entero)
+  const semanaNum = parseInt(semana.replace(/\D/g, ''), 10);
+  // El desplazamiento es (semanaNum - 1) mod 8
+  const desplazamiento = ((semanaNum - 1) % 8);
+
+  // Buscar fila datos
+  const fila = datosCosechados.find(f =>
+    String(f.Hacienda).trim() === String(hacienda).trim() &&
+    String(f.Semana).trim() === String(semana).trim()
+  );
+
+  if (fila) {
+    const edades = ['8','9','10','11','12','13','14','15','S/C'];
+    let anyDetalle = false;
+
+  const nombresColores = {
+  'black': 'NEGRO',
+  'white': 'BLANCO',
+  'blue': 'AZUL',
+  'green': 'VERDE',
+  'yellow': 'AMARILLO',
+  'brown': 'CAFE',
+  'red': 'ROJO',
+  'purple': 'LILA'
+};
+
+edades.forEach(edadStr => {
+  if (edadStr === 'S/C') return;
+
+  const val = fila[edadStr];
+  if (val !== undefined && val !== null && String(val).trim() !== '' && Number(val) !== 0) {
+    anyDetalle = true;
+    const edadNum = Number(edadStr);
+    const idxEdad = coloresBase.findIndex(c => c.edad === edadNum);
+    const idxColor = (idxEdad + desplazamiento) % coloresBase.length;
+    const colorAsignado = coloresBase[idxColor].color;
+
+    // Aquí cambio para que aparezca el nombre en español
+    const nombreColor = nombresColores[colorAsignado.toLowerCase()] || colorAsignado.toUpperCase();
+
+    const colorRect = document.createElement('span');
+    colorRect.style.display = 'inline-block';
+    colorRect.style.width = '14px';
+    colorRect.style.height = '14px';
+    colorRect.style.backgroundColor = colorAsignado;
+    colorRect.style.marginRight = '6px';
+    colorRect.style.border = '1px solid #000';
+    colorRect.style.verticalAlign = 'middle';
+    colorRect.title = nombreColor;
+
+    const colorNameSpan = document.createElement('span');
+    colorNameSpan.textContent = `${nombreColor}`;
+    colorNameSpan.style.color = '#fff';
+    colorNameSpan.style.fontWeight = 'bold';
+    colorNameSpan.style.marginRight = '8px';
+    colorNameSpan.style.verticalAlign = 'middle';
+
+    const edadLine = document.createElement('div');
+    edadLine.style.color = '#ffffff';
+    edadLine.style.marginBottom = '3px';
+
+    edadLine.appendChild(colorRect);
+    edadLine.appendChild(colorNameSpan);
+    edadLine.append(`(${edadStr}): ${val}`);
+
+    container.appendChild(edadLine);
+  }
+});
+
+    if (!anyDetalle) {
+      const noLine = document.createElement('div');
+      noLine.style.color = '#ffffff';
+      noLine.textContent = 'No hay detalles de edades';
+      container.appendChild(noLine);
+    }
+  } else {
+    // Si aún no se cargaron datos o no hay coincidencia
+    const noLine = document.createElement('div');
+    noLine.style.color = '#ffffff';
+    noLine.textContent = 'Detalles no disponibles';
+    container.appendChild(noLine);
+  }
+
+
+          // --- caso por defecto (otros datasets)
           } else {
             container.textContent = `${datasetLabel}: ${value}`;
             container.style.color = '#ffffff';
@@ -513,6 +654,8 @@ function createCharts() {
       scales: { x: { beginAtZero: true } }},
     plugins: [ChartDataLabels]});
 }
+
+
 
 
 
@@ -629,6 +772,11 @@ function fetchAndRender() {
     .then(res => res.json())
     .then(data => {
       fullData = data;
+
+      // --- NUEVO: recargar datos de cosechados (para tooltips)
+      cargarCosechados();
+      // --- fin NUEVO
+
       const filtrado = data.filter(r =>
         r.Hacienda === selected &&
         r['Racimos Cosechados'] !== undefined &&
@@ -663,3 +811,38 @@ document.addEventListener('DOMContentLoaded', () => {
     content.style.display = (content.id === tabInicial) ? 'block' : 'none';
   });
 });
+
+
+
+const coloresBase = ['NEGRO', 'BLANCO', 'AZUL', 'VERDE', 'AMARILLO', 'CAFE', 'ROJO', 'LILA'];
+
+// Mapea colores a sus códigos RGB o HEX (puedes personalizar)
+const coloresMap = {
+  'NEGRO': '#000000',
+  'BLANCO': '#FFFFFF',
+  'AZUL': '#0000FF',
+  'VERDE': '#008000',
+  'AMARILLO': '#FFFF00',
+  'CAFE': '#8B4513',
+  'ROJO': '#FF0000',
+  'LILA': '#800080'
+};
+
+/**
+ * Obtiene el color para un racimo de cierta edad en una semana dada.
+ * @param {number} semana - número de semana (ej. 1, 2, 3...)
+ * @param {number} edad - edad del racimo (de 8 a 15)
+ * @returns {string} - color en formato HEX
+ */
+function obtenerColorPorSemanaYEdad(semana, edad) {
+  if (edad < 8 || edad > 15) return '#888888'; // color gris para edades inválidas o S/C
+
+  const baseIndex = edad - 8; // índice 0..7
+  const desplazamiento = (semana - 1) % 8; // ciclo de 8 semanas
+
+  // calcula el índice del color cíclico para esta semana y edad
+  const colorIndex = (baseIndex - desplazamiento + 8) % 8;
+
+  const colorNombre = coloresBase[colorIndex];
+  return coloresMap[colorNombre] || '#000000'; // fallback negro
+}
