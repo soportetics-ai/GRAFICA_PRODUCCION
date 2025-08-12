@@ -383,7 +383,7 @@ function createCharts() {
             tooltipEl.style.position = 'absolute';
             tooltipEl.style.pointerEvents = 'none';
             tooltipEl.style.transition = 'all .1s ease';
-            tooltipEl.style.fontSize = '12px';
+            tooltipEl.style.fontSize = '11px';
             tooltipEl.style.fontFamily = 'Arial, sans-serif';
             document.body.appendChild(tooltipEl);
           }
@@ -482,8 +482,8 @@ function createCharts() {
 
 
 
-          // --- NUEVO: caso Racimos Cosechados -> mostrar detalle por edades desde datosCosechados
-          } else if (datasetLabel === 'Racimos Cosechados') {
+// --- NUEVO: caso Racimos Cosechados -> mostrar detalle por edades desde datosCosechados
+} else if (datasetLabel === 'Racimos Cosechados') {
   const mainLine = document.createElement('div');
   mainLine.style.display = 'flex';
   mainLine.style.alignItems = 'center';
@@ -531,73 +531,107 @@ function createCharts() {
     const edades = ['8','9','10','11','12','13','14','15','S/C'];
     let anyDetalle = false;
 
-  const nombresColores = {
-  'black': 'NEGRO',
-  'white': 'BLANCO',
-  'blue': 'AZUL',
-  'green': 'VERDE',
-  'yellow': 'AMARILLO',
-  'brown': 'CAFE',
-  'red': 'ROJO',
-  'purple': 'LILA'
-};
+    const nombresColores = {
+      'black': 'NEGRO',
+      'white': 'BLANCO',
+      'blue': 'AZUL',
+      'green': 'VERDE',
+      'yellow': 'AMARILLO',
+      'brown': 'CAFE',
+      'red': 'ROJO',
+      'purple': 'LILA'
+    };
 
-edades.forEach(edadStr => {
-  if (edadStr === 'S/C') return;
-
+    edades.forEach(edadStr => {
   const val = fila[edadStr];
   if (val !== undefined && val !== null && String(val).trim() !== '' && Number(val) !== 0) {
     anyDetalle = true;
-    const edadNum = Number(edadStr);
-    const idxEdad = coloresBase.findIndex(c => c.edad === edadNum);
-    const idxColor = (idxEdad + desplazamiento) % coloresBase.length;
-    const colorAsignado = coloresBase[idxColor].color;
+    if (edadStr === 'S/C') {
+      // Cuadrito transparente con borde gris y una "X" centrada para S/C
+      const colorRect = document.createElement('span');
+      colorRect.style.display = 'inline-block';
+      colorRect.style.width = '14px';
+      colorRect.style.height = '14px';
+      colorRect.style.backgroundColor = 'transparent';
+      colorRect.style.border = '1px solid #888';
+      colorRect.style.color = '#fff';
+      colorRect.style.fontWeight = 'bold';
+      colorRect.style.fontSize = '12px';
+      colorRect.style.lineHeight = '14px';
+      colorRect.style.textAlign = 'center';
+      colorRect.style.marginRight = '6px';
+      colorRect.style.verticalAlign = 'middle';
+      colorRect.style.userSelect = 'none';
+      colorRect.textContent = 'X';
+      colorRect.title = 'Sin Cinta';
 
-    // Aquí cambio para que aparezca el nombre en español
-    const nombreColor = nombresColores[colorAsignado.toLowerCase()] || colorAsignado.toUpperCase();
+      const colorNameSpan = document.createElement('span');
+      colorNameSpan.textContent = 'S/C';
+      colorNameSpan.style.color = '#fff';
+      colorNameSpan.style.fontWeight = 'bold';
+      colorNameSpan.style.marginRight = '8px';
+      colorNameSpan.style.verticalAlign = 'middle';
 
-    const colorRect = document.createElement('span');
-    colorRect.style.display = 'inline-block';
-    colorRect.style.width = '14px';
-    colorRect.style.height = '14px';
-    colorRect.style.backgroundColor = colorAsignado;
-    colorRect.style.marginRight = '6px';
-    colorRect.style.border = '1px solid #000';
-    colorRect.style.verticalAlign = 'middle';
-    colorRect.title = nombreColor;
+      const scLine = document.createElement('div');
+      scLine.style.color = '#ffffff';
+      scLine.style.marginBottom = '3px';
 
-    const colorNameSpan = document.createElement('span');
-    colorNameSpan.textContent = `${nombreColor}`;
-    colorNameSpan.style.color = '#fff';
-    colorNameSpan.style.fontWeight = 'bold';
-    colorNameSpan.style.marginRight = '8px';
-    colorNameSpan.style.verticalAlign = 'middle';
+      scLine.appendChild(colorRect);
+      scLine.appendChild(colorNameSpan);
+      scLine.append(`: ${val}`);
 
-    const edadLine = document.createElement('div');
-    edadLine.style.color = '#ffffff';
-    edadLine.style.marginBottom = '3px';
+      container.appendChild(scLine);
+    } else {
+      const edadNum = Number(edadStr);
+      const idxEdad = coloresBase.findIndex(c => c.edad === edadNum);
+      const idxColor = (idxEdad - desplazamiento + coloresBase.length) % coloresBase.length;
+      const colorAsignado = coloresBase[idxColor].color;
 
-    edadLine.appendChild(colorRect);
-    edadLine.appendChild(colorNameSpan);
-    edadLine.append(`(${edadStr}): ${val}`);
+      const nombreColor = nombresColores[colorAsignado.toLowerCase()] || colorAsignado.toUpperCase();
 
-    container.appendChild(edadLine);
+      const colorRect = document.createElement('span');
+      colorRect.style.display = 'inline-block';
+      colorRect.style.width = '14px';
+      colorRect.style.height = '14px';
+      colorRect.style.backgroundColor = colorAsignado;
+      colorRect.style.marginRight = '6px';
+      colorRect.style.border = '1px solid #000';
+      colorRect.style.verticalAlign = 'middle';
+      colorRect.title = nombreColor;
+
+      const colorNameSpan = document.createElement('span');
+      colorNameSpan.textContent = `${nombreColor}`;
+      colorNameSpan.style.color = '#fff';
+      colorNameSpan.style.fontWeight = 'bold';
+      colorNameSpan.style.marginRight = '8px';
+      colorNameSpan.style.verticalAlign = 'middle';
+
+      const edadLine = document.createElement('div');
+      edadLine.style.color = '#ffffff';
+      edadLine.style.marginBottom = '3px';
+
+      edadLine.appendChild(colorRect);
+      edadLine.appendChild(colorNameSpan);
+      edadLine.append(`(${edadStr}): ${val}`);
+
+      container.appendChild(edadLine);
+    }
   }
 });
 
-    if (!anyDetalle) {
-      const noLine = document.createElement('div');
-      noLine.style.color = '#ffffff';
-      noLine.textContent = 'No hay detalles de edades';
-      container.appendChild(noLine);
-    }
-  } else {
-    // Si aún no se cargaron datos o no hay coincidencia
-    const noLine = document.createElement('div');
-    noLine.style.color = '#ffffff';
-    noLine.textContent = 'Detalles no disponibles';
-    container.appendChild(noLine);
-  }
+if (!anyDetalle) {
+  const noLine = document.createElement('div');
+  noLine.style.color = '#ffffff';
+  noLine.textContent = 'No hay detalles de edades';
+  container.appendChild(noLine);
+} 
+} else {
+  // Si aún no se cargaron datos o no hay coincidencia
+  const noLine = document.createElement('div');
+  noLine.style.color = '#ffffff';
+  noLine.textContent = 'Detalles no disponibles';
+  container.appendChild(noLine);
+}
 
 
           // --- caso por defecto (otros datasets)
