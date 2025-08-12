@@ -72,6 +72,7 @@ canvas { height: 100% !important; }
   align-items: center;
   z-index: 20;
   font-family: inherit;
+  
 }
 
 .magic-wand-btn .magic-label {
@@ -86,6 +87,7 @@ canvas { height: 100% !important; }
   height: 20px;
   margin-left: 6px;
   margin-top: 6px;
+  
 }
 
 #haciendaSelector {
@@ -99,7 +101,7 @@ canvas { height: 100% !important; }
   -webkit-appearance: none;
   -moz-appearance: none;
   outline: none;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(22, 31, 49, 0.5);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -119,6 +121,7 @@ canvas { height: 100% !important; }
   color: #1c1c1e;
   line-height: 1.5;
   display: none;
+  
 }
 
 #resumenSection h2 {
@@ -155,7 +158,7 @@ canvas { height: 100% !important; }
   padding: 16px;
   margin-bottom: 20px;
   background-color: #ffffff;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  box-shadow: 0 5px 5px rgba(0,0,0,0.05);
   height: 100;      /* o un valor menor, ejemplo: 150px */
   max-height: 400px; /* para limitar */
   padding: 5px 10px; /* menos espacio interno */
@@ -208,10 +211,11 @@ canvas { height: 100% !important; }
 }
 
 #resumen-cajas {
-  max-width: 100%;
-  overflow-x: auto; /* scroll horizontal si hace falta */
-  box-sizing: border-box;
-  padding: 10px; /* para que no quede muy pegado */
+  width: 100%;       /* o un max-width razonable */
+  box-sizing: border-box;  /* para que padding no aumente ancho */
+  overflow-wrap: break-word;  /* para que texto largo se parta y no desborde */
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .tabla-resumen {
@@ -237,7 +241,7 @@ canvas { height: 100% !important; }
 
 #resumen-cajas ol#cajasFincas {
   max-width: 400px;
-  overflow-y: auto;
+  /* overflow-y: auto; */
   border-right: 1px solid #ccc;
   padding-right: 10px;
 }
@@ -274,11 +278,13 @@ canvas { height: 100% !important; }
 }
 
 #cajasFincas {
-  max-width: 300px;
-  overflow-y: auto;
-  border-right: 1px solid #ccc;
+  max-width: 300px;   /* controla que no se haga muy ancha */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  margin: 0;
   padding-right: 10px;
-  margin: 0;       /* recomendable para listas */
+  border-right: 1px solid #ccc;
 }
 
 .tabla-resumen {
@@ -297,7 +303,7 @@ canvas { height: 100% !important; }
 
 
 #cajasFincas li {
-  font-size: 14px;
+  font-size: 12px;
   padding: 4px 0;
   color: #bbbbbb;
 }
