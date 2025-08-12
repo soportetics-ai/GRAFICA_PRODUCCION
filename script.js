@@ -262,11 +262,11 @@ function createCharts() {
 
 
       tooltip: {
-  enabled: false, // desactivamos el tooltip normal
+  enabled: false, // desactivamos el tooltip nativo
   external: function (context) {
     // Creamos o usamos un div para el tooltip personalizado
     let tooltipEl = document.getElementById('chartjs-tooltip');
-    
+
     // Crear el div si no existe
     if (!tooltipEl) {
       tooltipEl = document.createElement('div');
@@ -275,11 +275,14 @@ function createCharts() {
       tooltipEl.style.color = 'white';
       tooltipEl.style.borderRadius = '3px';
       tooltipEl.style.padding = '8px';
-      tooltipEl.style.position = 'absolute';
+      tooltipEl.style.position = 'fixed'; // FIXED en vez de absolute
       tooltipEl.style.pointerEvents = 'none';
       tooltipEl.style.transition = 'all .1s ease';
       tooltipEl.style.fontSize = '12px';
       tooltipEl.style.fontFamily = 'Arial, sans-serif';
+      tooltipEl.style.zIndex = '9999';
+      tooltipEl.style.maxWidth = '300px';
+      tooltipEl.style.overflowWrap = 'break-word';
       document.body.appendChild(tooltipEl);
     }
 
@@ -290,21 +293,34 @@ function createCharts() {
       return;
     }
 
-    // Posicionamos el tooltip
+    // Posicionamos el tooltip relativo a la ventana (viewport)
     const canvasRect = context.chart.canvas.getBoundingClientRect();
+    const left = canvasRect.left + tooltipModel.caretX;
+    const top = canvasRect.top + tooltipModel.caretY;
 
-    // Posición base según caret (puntero)
-    let left = canvasRect.left + window.pageXOffset + tooltipModel.caretX;
-    let top = canvasRect.top + window.pageYOffset + tooltipModel.caretY;
+    // Ajuste para que no se salga de la pantalla derecha
+    const tooltipWidth = tooltipEl.offsetWidth || 0;
+    const windowWidth = window.innerWidth;
+    let adjustedLeft = left;
+    if (left + tooltipWidth > windowWidth) {
+      adjustedLeft = windowWidth - tooltipWidth - 10; // 10px margen
+    }
 
-    // Medimos dimensiones tooltip para evitar overflow
+    // Ajuste para que no se salga por arriba o abajo (opcional)
+    const tooltipHeight = tooltipEl.offsetHeight || 0;
+    const windowHeight = window.innerHeight;
+    let adjustedTop = top;
+    if (top + tooltipHeight > windowHeight) {
+      adjustedTop = windowHeight - tooltipHeight - 10; // 10px margen
+    }
+    if (adjustedTop < 10) adjustedTop = 10; // margen superior
+
     tooltipEl.style.opacity = 1;
-    tooltipEl.style.left = '0px';  // reset temporal
-    tooltipEl.style.top = '0px';   // reset temporal
-    tooltipEl.innerHTML = '';      // limpio contenido para medir tamaño
+    tooltipEl.style.left = adjustedLeft + 'px';
+    tooltipEl.style.top = adjustedTop + 'px';
 
-    // -- Luego generamos contenido (esto es necesario para medir tamaño) --
-    // Aquí construimos el contenido como en tu código original
+    // Limpiamos contenido previo
+    tooltipEl.innerHTML = '';
 
     // Datos del tooltip
     const dataIndex = tooltipModel.dataPoints[0].dataIndex;
@@ -313,35 +329,40 @@ function createCharts() {
     const semana = context.chart.data.labels[dataIndex];
     const hacienda = haciendaSelector.value;
 
-    const container = document.createElement('div');
-
     if (datasetLabel === 'Rechazados') {
+      // Filtramos filas causas
       const filasCausas = fullData.filter(r =>
         r.Hacienda === hacienda &&
         r.Semana === semana &&
         (!r['Racimos Cosechados'] || r['Racimos Cosechados'] === '')
       );
+      // Total rechazados en la semana para esa hacienda (evitamos dividir por cero)
       const totalRechazosSemana = fullData
         .filter(r => r.Hacienda === hacienda && r.Semana === semana)
         .reduce((acc, cur) => acc + (+cur['Rechazados'] || 0), 0) || 1;
 
+      // Contenedor principal
+      const container = document.createElement('div');
+
+      // Línea principal (total) en negrita y color rojo claro
       const mainLine = document.createElement('div');
       mainLine.style.display = 'flex';
       mainLine.style.alignItems = 'center';
       mainLine.style.fontWeight = 'bold';
       mainLine.style.color = '#ffc0c0ff';
-      mainLine.style.marginBottom = '6px';
+      mainLine.style.marginBottom = '6px';  // Separación después del total
 
       const colorBox = document.createElement('span');
       colorBox.style.display = 'inline-block';
       colorBox.style.width = '12px';
       colorBox.style.height = '12px';
-      colorBox.style.backgroundColor = 'rgba(255, 99, 132, 0.6)';
+      colorBox.style.backgroundColor = 'rgba(255, 99, 132, 0.6)'; // mismo color barra
       colorBox.style.marginRight = '8px';
       colorBox.style.borderRadius = '2px';
 
       mainLine.appendChild(colorBox);
       mainLine.appendChild(document.createTextNode(`${datasetLabel}: ${value}`));
+
       container.appendChild(mainLine);
 
       if (filasCausas.length > 0) {
@@ -366,7 +387,7 @@ function createCharts() {
           const causaLine = document.createElement('div');
           causaLine.style.fontWeight = 'bold';
           causaLine.style.color = '#ffffff';
-          causaLine.style.marginBottom = '3px';
+          causaLine.style.marginBottom = '3px'; // espacio entre causas
 
           causaLine.textContent = `${nombre}: ${val} `;
 
@@ -379,48 +400,18 @@ function createCharts() {
           container.appendChild(causaLine);
         });
       }
+
+      tooltipEl.appendChild(container);
     } else {
-      container.textContent = `${datasetLabel}: ${value}`;
-      container.style.color = '#ffffff';
-      container.style.fontWeight = 'bold';
+      // Tooltip normal para otras datasets
+      tooltipEl.textContent = `${datasetLabel}: ${value}`;
+      tooltipEl.style.color = '#ffffff';
+      tooltipEl.style.fontWeight = 'bold';
     }
-
-    tooltipEl.appendChild(container);
-
-    // Ahora que ya tiene contenido, medimos su tamaño
-    const tooltipRect = tooltipEl.getBoundingClientRect();
-    const padding = 10; // margen extra para que no toque borde pantalla
-
-    // Ajuste horizontal: si se pasa del lado derecho, lo movemos a la izquierda
-    if (left + tooltipRect.width + padding > window.pageXOffset + window.innerWidth) {
-      left = window.pageXOffset + window.innerWidth - tooltipRect.width - padding;
-    }
-    // Ajuste vertical: si se pasa por abajo, lo movemos hacia arriba
-    if (top + tooltipRect.height + padding > window.pageYOffset + window.innerHeight) {
-      top = top - tooltipRect.height - padding;
-      if (top < window.pageYOffset) top = window.pageYOffset + padding; // no se salga arriba tampoco
-    }
-    // Ajuste mínimo para que no se salga por la izquierda o arriba
-    if (left < window.pageXOffset + padding) {
-      left = window.pageXOffset + padding;
-    }
-    if (top < window.pageYOffset + padding) {
-      top = window.pageYOffset + padding;
-    }
-
-    // Aplicamos la posición corregida
-    tooltipEl.style.left = left + 'px';
-    tooltipEl.style.top = top + 'px';
   }
 }
     },
 
-  
-
-
-
-
-    
       scales: {
         x: {
           beginAtZero: true,
@@ -428,6 +419,12 @@ function createCharts() {
           barPercentage: 3.8,
         }}},
     plugins: [ChartDataLabels]});
+
+
+
+
+
+    
 
   cajasChart = new Chart(cajasCtx, {
     type: 'bar',
