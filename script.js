@@ -136,6 +136,115 @@ if (len >= 2) {
 
 
 
+
+
+  function generarResumenCajas(semana = 'Todas') {
+  const selectedHacienda = haciendaSelector.value;
+  const haciendasUnicas = [...new Set(fullData.map(r => r.Hacienda).filter(h => h && h.trim() !== ''))];
+
+  const resumenCajas = haciendasUnicas.map(hacienda => {
+    let datosHacienda = fullData.filter(r => r.Hacienda === hacienda);
+
+    if (semana !== 'Todas') {
+      datosHacienda = datosHacienda.filter(r => r.Semana === semana);
+    }
+
+    const totalCajas = datosHacienda.reduce((acc, cur) => acc + (+cur['Cajas'] || 0), 0);
+
+    return { hacienda, totalCajas };
+  });
+
+  resumenCajas.sort((a, b) => b.totalCajas - a.totalCajas);
+
+  const ol = document.getElementById('cajasFincas');
+  ol.innerHTML = '';
+
+  resumenCajas.forEach(({ hacienda, totalCajas }) => {
+    const li = document.createElement('li');
+    li.textContent = `${hacienda}: ${totalCajas.toLocaleString()} cajas`;
+
+    if (hacienda === selectedHacienda) {
+      li.classList.add('selected-hacienda');
+    } else {
+      li.classList.remove('selected-hacienda');
+    }
+
+    ol.appendChild(li);
+  });
+
+  const produccionElOro = resumenCajas
+    .filter(r => r.hacienda !== 'AGRO&SOL')
+    .reduce((acc, cur) => acc + cur.totalCajas, 0);
+
+  const produccionPeninsula = resumenCajas
+    .filter(r => r.hacienda === 'AGRO&SOL')
+    .reduce((acc, cur) => acc + cur.totalCajas, 0);
+
+  const produccionGlobal = produccionElOro + produccionPeninsula;
+
+  const resumenTabla = `
+    <div class="tabla-resumen-contenido">
+      <div class="tabla-item">
+        <strong>Producción EL ORO</strong><br>
+        <span class="cantidad">${produccionElOro.toLocaleString()} cajas</span>
+      </div>
+      <div class="tabla-item">
+        <strong>Producción PENÍNSULA</strong><br>
+        <span class="cantidad">${produccionPeninsula.toLocaleString()} cajas</span>
+      </div>
+      <div class="tabla-item">
+        <strong>Producción Global</strong><br>
+        <span class="cantidad">${produccionGlobal.toLocaleString()} cajas</span>
+      </div>
+    </div>
+  `;
+
+  const resumenDiv = document.getElementById('tablaResumen');
+  resumenDiv.innerHTML = resumenTabla;
+}
+
+document.getElementById('filtroSemanaCajas').addEventListener('change', e => {
+  generarResumenCajas(e.target.value);
+});
+
+function llenarFiltroSemanaCajas() {
+  const select = document.getElementById('filtroSemanaCajas');
+  const semanasUnicas = [...new Set(
+    fullData.map(r => r.Semana).filter(sem => sem !== null && sem !== undefined && sem.toString().trim() !== '')
+  )].sort((a, b) => parseInt(a) - parseInt(b));
+
+  select.querySelectorAll('option:not([value="Todas"])').forEach(opt => opt.remove());
+
+  semanasUnicas.forEach(sem => {
+    const option = document.createElement('option');
+    option.value = sem;
+    option.textContent = `Semana ${sem}`;
+    select.appendChild(option);
+  });
+}
+
+llenarFiltroSemanaCajas();
+generarResumenCajas();
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
 // GENERA RESUMEN DE POSICION 🏆***********  
   function generarResumenPosicion(semana = 'Todas') {
   const selectedHacienda = haciendaSelector.value;
@@ -159,7 +268,7 @@ if (len >= 2) {
     const semanasActivas = semanasActivasSet.size || 1;
     const hectareas = hectareasPorFinca[hacienda] || 1;
     const divisorSemanas = (semana === 'Todas') ? semanasActivas : 1;
-    const promedioSemanal = ((totalCajas / hectareas) / divisorSemanas).toFixed(2);
+    const promedioSemanal = ((totalCajas / hectareas) / divisorSemanas).toFixed(0);
     return { hacienda, promedioSemanal };});
   resumenPosicion.sort((a, b) => b.promedioSemanal - a.promedioSemanal);
   const rankingList = document.getElementById("rankingFincas");

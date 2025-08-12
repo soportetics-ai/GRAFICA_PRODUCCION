@@ -57,10 +57,27 @@
       <p>Mes menos productivo: <strong id="mesMenosProductivo">--</strong></p>
     </div>
     <div class="resumen-bloque" id="resumen-semanas">
-      <h3>Semanas 📦</h3>
+      <h3>Semanas 📅</h3>
       <p>Semana más productiva: <strong id="semanaMasProductiva">--</strong></p>
       <p>Semana menos productiva: <strong id="semanaMenosProductiva">--</strong></p>
     </div>
+
+
+  <!-- PARAMETROS PARA BLOQUE CAJAS 📦 --> 
+    <label for="filtroSemanaCajas">Filtrar por semana:</label>
+<select id="filtroSemanaCajas">
+  <option value="Todas" selected>Todas</option> 
+</select> 
+
+<div class="resumen-bloque" id="resumen-cajas">
+  <h3>Cajas 📦</h3>
+  <div class="contenedor-cajas-flex" style="display: flex; gap: 20px; align-items: flex-start;">
+    <ol id="cajasFincas" style="max-width: 300px; overflow-y: auto; border-right: 1px solid #ccc; padding-right: 10px;"></ol>
+    <div id="tablaResumen" class="tabla-resumen" style="max-width: 250px; width: max-content; border: 1px solid black; padding: 5px; font-size: 13px; word-wrap: break-word; box-sizing: border-box;"></div>
+  </div>
+</div>
+
+
 
 <!-- PARAMETROS PARA FILTRO DE BLOQUE POSICION 🏆--> 
     <label for="filtroSemanaPosicion">Filtrar por semana:</label>
