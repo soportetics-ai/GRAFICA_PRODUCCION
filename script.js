@@ -175,10 +175,27 @@ function llenarFiltroSemanaPosicion() {
     option.value = sem;
     option.textContent = `Semana ${sem}`;
     select.appendChild(option);
-  });
-}
+  });}
 llenarFiltroSemanaPosicion();
 generarResumenPosicion('Todas');
+
+// 🌪️ FILTRO PARA POSICION*********** 
+function llenarFiltroSemanaPosicion() {
+  const select = document.getElementById('filtroSemanaPosicion');
+  const semanasUnicas = [...new Set(
+    fullData.map(r => r.Semana).filter(sem => sem !== null && sem !== undefined && sem.toString().trim() !== ''))].sort((a,b) => parseInt(a) - parseInt(b));
+  select.querySelectorAll('option:not([value="Todas"])').forEach(opt => opt.remove());
+  semanasUnicas.forEach(sem => {
+    const option = document.createElement('option');
+    option.value = sem;
+    option.textContent = `Semana ${sem}`;
+    select.appendChild(option);
+  });
+}
+
+
+
+
 
  
 
@@ -210,12 +227,6 @@ generarResumenPosicion('Todas');
   llenarFiltroSemana();
   generarResumenRacimosRechazados();}
 
-
-  
-
-
-
-
 // 🌪️ FILTRO PARA RECHASOS***********   
 function llenarFiltroSemana() {
   const select = document.getElementById('filtroSemanaRechazados');
@@ -233,19 +244,6 @@ function llenarFiltroSemana() {
 
 
 
-// 🌪️ FILTRO PARA POSICION*********** 
-function llenarFiltroSemanaPosicion() {
-  const select = document.getElementById('filtroSemanaPosicion');
-  const semanasUnicas = [...new Set(
-    fullData.map(r => r.Semana).filter(sem => sem !== null && sem !== undefined && sem.toString().trim() !== ''))].sort((a,b) => parseInt(a) - parseInt(b));
-  select.querySelectorAll('option:not([value="Todas"])').forEach(opt => opt.remove());
-  semanasUnicas.forEach(sem => {
-    const option = document.createElement('option');
-    option.value = sem;
-    option.textContent = `Semana ${sem}`;
-    select.appendChild(option);
-  });
-}
 
 
 
@@ -255,82 +253,155 @@ function llenarFiltroSemanaPosicion() {
 
 
 
-
-
-
-
-
-// 📊 *********** SCRIPT CHART ( GRAFICO DE BARRAS ) 📊*********** 
+// 📊📊📊📊📊📊 SCRIPT CHART ( GRAFICO DE BARRAS ) 📊📊📊📊📊📊📊
 function createCharts() {
-  racimosChart = new Chart(racimosCtx, {
-    type: 'bar',
-    data: { labels: [], datasets: [] },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      layout: {
-        padding: { top: 0, bottom: 0 }
-      },
+  racimosChart = new Chart(racimosCtx, {type: 'bar',data: { labels: [], datasets: [] },options: {indexAxis: 'y',responsive: true,maintainAspectRatio: false,layout: {padding: { top: 0, bottom: 0 }},
       plugins: {
-        legend: { position: 'top' },
-        datalabels: { anchor: 'end', align: 'right', color: 'black', font: { weight: 'bold', size: 12 } },
-        tooltip: {
-          enabled: true,
-          callbacks: {
-            label: function (context) {
-              const datasetLabel = context.dataset.label || '';
-              const value = context.parsed.x;
-              const semana = context.chart.data.labels[context.dataIndex];
-              const hacienda = haciendaSelector.value;
+        legend: { position: 'top' },datalabels: { anchor: 'end', align: 'right', color: 'black', font: { weight: 'bold', size: 12 } },
 
-              if (datasetLabel === 'Rechazados') {
-                const filasCausas = fullData.filter(r =>
-                  r.Hacienda === hacienda &&
-                  r.Semana === semana &&
-                  (!r['Racimos Cosechados'] || r['Racimos Cosechados'] === '')
-                );
 
-                let causas = [];
 
-                if (filasCausas.length > 0) {
-                  const todasLasClaves = Object.keys(filasCausas[0]);
-                  const causasPosibles = todasLasClaves.filter(k =>
-                    !['Semana', 'Hacienda', 'Racimos Cosechados', 'Procesados', 'Rechazados', 'Cajas', 'Rathio'].includes(k)
-                  );
+      tooltip: {
+  enabled: false, // desactivamos el tooltip normal
+  external: function (context) {
+    // Creamos o usamos un div para el tooltip personalizado
+    let tooltipEl = document.getElementById('chartjs-tooltip');
 
-                  const sumaPorCausa = {};
-                  for (const fila of filasCausas) {
-                    for (const causa of causasPosibles) {
-                      const valor = +fila[causa] || 0;
-                      if (valor > 0) {
-                        sumaPorCausa[causa] = (sumaPorCausa[causa] || 0) + valor;
-                      }
-                    }
-                  }
+    // Crear el div si no existe
+    if (!tooltipEl) {
+      tooltipEl = document.createElement('div');
+      tooltipEl.id = 'chartjs-tooltip';
+      tooltipEl.style.background = 'rgba(0, 0, 0, 0.81)';
+      tooltipEl.style.color = 'white';
+      tooltipEl.style.borderRadius = '3px';
+      tooltipEl.style.padding = '8px';
+      tooltipEl.style.position = 'absolute';
+      tooltipEl.style.pointerEvents = 'none';
+      tooltipEl.style.transition = 'all .1s ease';
+      tooltipEl.style.fontSize = '12px';
+      tooltipEl.style.fontFamily = 'Arial, sans-serif';
+      document.body.appendChild(tooltipEl);
+    }
 
-                  const ordenado = Object.entries(sumaPorCausa).sort((a, b) => b[1] - a[1]);
-                  causas = ordenado.map(([nombre, valor]) => `${nombre}: ${valor}`);
-                }
+    // Tooltip oculto si no hay tooltip activo
+    const tooltipModel = context.tooltip;
+    if (tooltipModel.opacity === 0) {
+      tooltipEl.style.opacity = 0;
+      return;
+    }
 
-                return [`${datasetLabel}: ${value}`, ...causas];
-              }
+    // Posicionamos el tooltip
+    const canvasRect = context.chart.canvas.getBoundingClientRect();
+    tooltipEl.style.opacity = 1;
+    tooltipEl.style.left = canvasRect.left + window.pageXOffset + tooltipModel.caretX + 'px';
+    tooltipEl.style.top = canvasRect.top + window.pageYOffset + tooltipModel.caretY + 'px';
 
-              return `${datasetLabel}: ${value}`;
+    // Limpiamos contenido previo
+    tooltipEl.innerHTML = '';
+
+    // Datos del tooltip
+    const dataIndex = tooltipModel.dataPoints[0].dataIndex;
+    const datasetLabel = tooltipModel.dataPoints[0].dataset.label;
+    const value = tooltipModel.dataPoints[0].parsed.x;
+    const semana = context.chart.data.labels[dataIndex];
+    const hacienda = haciendaSelector.value;
+
+    if (datasetLabel === 'Rechazados') {
+      // Filtramos filas causas
+      const filasCausas = fullData.filter(r =>
+        r.Hacienda === hacienda &&
+        r.Semana === semana &&
+        (!r['Racimos Cosechados'] || r['Racimos Cosechados'] === '')
+      );
+      // Total rechazados en la semana para esa hacienda (evitamos dividir por cero)
+      const totalRechazosSemana = fullData
+        .filter(r => r.Hacienda === hacienda && r.Semana === semana)
+        .reduce((acc, cur) => acc + (+cur['Rechazados'] || 0), 0) || 1;
+
+      // Contenedor principal
+      const container = document.createElement('div');
+
+      // Línea principal (total) en negrita y color blanco
+      const mainLine = document.createElement('div');
+      mainLine.style.display = 'flex';
+      mainLine.style.alignItems = 'center';
+      mainLine.style.fontWeight = 'bold';
+      mainLine.style.color = '#ffffff';
+      mainLine.style.marginBottom = '6px';  // Separación después del total
+
+      const colorBox = document.createElement('span');
+      colorBox.style.display = 'inline-block';
+      colorBox.style.width = '12px';
+      colorBox.style.height = '12px';
+      colorBox.style.backgroundColor = 'rgba(255, 99, 132, 0.6)'; // mismo color rojo barra Rechazados
+      colorBox.style.marginRight = '8px';
+      colorBox.style.borderRadius = '2px';
+
+      mainLine.appendChild(colorBox);
+      mainLine.appendChild(document.createTextNode(`${datasetLabel}: ${value}`));
+
+      container.appendChild(mainLine);
+
+      if (filasCausas.length > 0) {
+        const todasLasClaves = Object.keys(filasCausas[0]);
+        const causasPosibles = todasLasClaves.filter(k =>
+          !['Semana', 'Hacienda', 'Racimos Cosechados', 'Procesados', 'Rechazados', 'Cajas', 'Rathio'].includes(k)
+        );
+        const sumaPorCausa = {};
+        for (const fila of filasCausas) {
+          for (const causa of causasPosibles) {
+            const val = +fila[causa] || 0;
+            if (val > 0) {
+              sumaPorCausa[causa] = (sumaPorCausa[causa] || 0) + val;
             }
           }
         }
-      },
+        const ordenado = Object.entries(sumaPorCausa).sort((a, b) => b[1] - a[1]);
+
+        ordenado.forEach(([nombre, val]) => {
+          const porcentaje = ((val / totalRechazosSemana) * 100).toFixed(2);
+
+          const causaLine = document.createElement('div');
+          causaLine.style.fontWeight = 'bold';
+          causaLine.style.color = '#ffffff';
+          causaLine.style.marginBottom = '3px'; // espacio entre causas
+
+          causaLine.textContent = `${nombre}: ${val} `;
+
+          const porcentajeSpan = document.createElement('span');
+          porcentajeSpan.style.fontWeight = 'normal';
+          porcentajeSpan.style.color = '#a5a5a5ff';
+          porcentajeSpan.textContent = `(${porcentaje}%)`;
+
+          causaLine.appendChild(porcentajeSpan);
+          container.appendChild(causaLine);
+        });
+      }
+
+      tooltipEl.appendChild(container);
+    } else {
+      // Tooltip normal para otras datasets
+      tooltipEl.textContent = `${datasetLabel}: ${value}`;
+      tooltipEl.style.color = '#ffffff';
+      tooltipEl.style.fontWeight = 'bold';
+    }
+  }
+}
+    },
+
+  
+
+
+
+
+    
       scales: {
         x: {
           beginAtZero: true,
           categoryPercentage: 3.0,
           barPercentage: 3.8,
-        }
-      }
-    },
-    plugins: [ChartDataLabels]
-  });
+        }}},
+    plugins: [ChartDataLabels]});
 
   cajasChart = new Chart(cajasCtx, {
     type: 'bar',
@@ -341,27 +412,20 @@ function createCharts() {
       maintainAspectRatio: false,
       plugins: {
         legend: { position: 'top' },
-        datalabels: {
-          anchor: 'end',
-          align: 'right',
-          color: 'black',
-          font: { weight: 'bold' }
-        }
+        datalabels: { anchor: 'end',align: 'right',color: 'black',font: { weight: 'bold' }}
       },
-      scales: { x: { beginAtZero: true } }
-    },
-    plugins: [ChartDataLabels]
-  });
+      scales: { x: { beginAtZero: true } }},
+    plugins: [ChartDataLabels]});
 }
+
+
 
 function updateCharts(data) {
   const semanas = data.map(row => row.Semana);
   const racimosCosechados = data.map(row => +row['Racimos Cosechados'] || 0);
   const racimosProcesados = data.map(row => +row['Procesados'] || 0);
   const racimosRechazados = data.map(row => +row['Rechazados'] || 0);
-
   racimosChart.data.labels = semanas;
-
   const datasetsRacimos = [
     {
       label: 'Racimos Cosechados',
@@ -379,7 +443,6 @@ function updateCharts(data) {
       categoryPercentage: 1,
       barPercentage: 0.8,
     },
-
       {
     label: 'Rechazados',
     data: racimosRechazados,
@@ -391,7 +454,7 @@ function updateCharts(data) {
       labels: {
         cantidad: {
           formatter: function(value) {
-            return value;  // solo el número
+            return value;
           },
           anchor: 'end',
           align: 'right',
@@ -410,11 +473,7 @@ function updateCharts(data) {
           color: 'rgba(0,0,0,0.5)',
           font: { weight: 'normal', size: 11},
           offset: 25
-        }
-      }
-    }
-  }
-  ];
+        }}}}];
 
   datasetsRacimos.forEach((ds) => {
     ds.hidden = visibilidadRacimos[ds.label] || false;
@@ -486,4 +545,3 @@ document.getElementById('modal').addEventListener('click', () => {
 
 createCharts();
 fetchAndRender();
-
