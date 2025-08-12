@@ -262,156 +262,144 @@ function createCharts() {
 
 
       tooltip: {
-  enabled: false, // desactivamos el tooltip nativo
-  external: function (context) {
-    // Creamos o usamos un div para el tooltip personalizado
-    let tooltipEl = document.getElementById('chartjs-tooltip');
+        enabled: false,
+        external: function (context) {
+          let tooltipEl = document.getElementById('chartjs-tooltip');
 
-    // Crear el div si no existe
-    if (!tooltipEl) {
-      tooltipEl = document.createElement('div');
-      tooltipEl.id = 'chartjs-tooltip';
-      tooltipEl.style.background = 'rgba(0, 0, 0, 0.81)';
-      tooltipEl.style.color = 'white';
-      tooltipEl.style.borderRadius = '3px';
-      tooltipEl.style.padding = '8px';
-      tooltipEl.style.position = 'fixed'; // FIXED en vez de absolute
-      tooltipEl.style.pointerEvents = 'none';
-      tooltipEl.style.transition = 'all .1s ease';
-      tooltipEl.style.fontSize = '12px';
-      tooltipEl.style.fontFamily = 'Arial, sans-serif';
-      tooltipEl.style.zIndex = '9999';
-      tooltipEl.style.maxWidth = '300px';
-      tooltipEl.style.overflowWrap = 'break-word';
-      document.body.appendChild(tooltipEl);
-    }
-
-    // Tooltip oculto si no hay tooltip activo
-    const tooltipModel = context.tooltip;
-    if (tooltipModel.opacity === 0) {
-      tooltipEl.style.opacity = 0;
-      return;
-    }
-
-    // Posicionamos el tooltip relativo a la ventana (viewport)
-    const canvasRect = context.chart.canvas.getBoundingClientRect();
-    const left = canvasRect.left + tooltipModel.caretX;
-    const top = canvasRect.top + tooltipModel.caretY;
-
-    // Ajuste para que no se salga de la pantalla derecha
-    const tooltipWidth = tooltipEl.offsetWidth || 0;
-    const windowWidth = window.innerWidth;
-    let adjustedLeft = left;
-    if (left + tooltipWidth > windowWidth) {
-      adjustedLeft = windowWidth - tooltipWidth - 10; // 10px margen
-    }
-
-    // Ajuste para que no se salga por arriba o abajo (opcional)
-    const tooltipHeight = tooltipEl.offsetHeight || 0;
-    const windowHeight = window.innerHeight;
-    let adjustedTop = top;
-    if (top + tooltipHeight > windowHeight) {
-      adjustedTop = windowHeight - tooltipHeight - 10; // 10px margen
-    }
-    if (adjustedTop < 10) adjustedTop = 10; // margen superior
-
-    tooltipEl.style.opacity = 1;
-    tooltipEl.style.left = adjustedLeft + 'px';
-    tooltipEl.style.top = adjustedTop + 'px';
-
-    // Limpiamos contenido previo
-    tooltipEl.innerHTML = '';
-
-    // Datos del tooltip
-    const dataIndex = tooltipModel.dataPoints[0].dataIndex;
-    const datasetLabel = tooltipModel.dataPoints[0].dataset.label;
-    const value = tooltipModel.dataPoints[0].parsed.x;
-    const semana = context.chart.data.labels[dataIndex];
-    const hacienda = haciendaSelector.value;
-
-    if (datasetLabel === 'Rechazados') {
-      // Filtramos filas causas
-      const filasCausas = fullData.filter(r =>
-        r.Hacienda === hacienda &&
-        r.Semana === semana &&
-        (!r['Racimos Cosechados'] || r['Racimos Cosechados'] === '')
-      );
-      // Total rechazados en la semana para esa hacienda (evitamos dividir por cero)
-      const totalRechazosSemana = fullData
-        .filter(r => r.Hacienda === hacienda && r.Semana === semana)
-        .reduce((acc, cur) => acc + (+cur['Rechazados'] || 0), 0) || 1;
-
-      // Contenedor principal
-      const container = document.createElement('div');
-
-      // Línea principal (total) en negrita y color rojo claro
-      const mainLine = document.createElement('div');
-      mainLine.style.display = 'flex';
-      mainLine.style.alignItems = 'center';
-      mainLine.style.fontWeight = 'bold';
-      mainLine.style.color = '#ffc0c0ff';
-      mainLine.style.marginBottom = '6px';  // Separación después del total
-
-      const colorBox = document.createElement('span');
-      colorBox.style.display = 'inline-block';
-      colorBox.style.width = '12px';
-      colorBox.style.height = '12px';
-      colorBox.style.backgroundColor = 'rgba(255, 99, 132, 0.6)'; // mismo color barra
-      colorBox.style.marginRight = '8px';
-      colorBox.style.borderRadius = '2px';
-
-      mainLine.appendChild(colorBox);
-      mainLine.appendChild(document.createTextNode(`${datasetLabel}: ${value}`));
-
-      container.appendChild(mainLine);
-
-      if (filasCausas.length > 0) {
-        const todasLasClaves = Object.keys(filasCausas[0]);
-        const causasPosibles = todasLasClaves.filter(k =>
-          !['Semana', 'Hacienda', 'Racimos Cosechados', 'Procesados', 'Rechazados', 'Cajas', 'Rathio'].includes(k)
-        );
-        const sumaPorCausa = {};
-        for (const fila of filasCausas) {
-          for (const causa of causasPosibles) {
-            const val = +fila[causa] || 0;
-            if (val > 0) {
-              sumaPorCausa[causa] = (sumaPorCausa[causa] || 0) + val;
-            }
+          if (!tooltipEl) {
+            tooltipEl = document.createElement('div');
+            tooltipEl.id = 'chartjs-tooltip';
+            tooltipEl.style.background = 'rgba(0, 0, 0, 0.81)';
+            tooltipEl.style.color = 'white';
+            tooltipEl.style.borderRadius = '3px';
+            tooltipEl.style.padding = '8px';
+            tooltipEl.style.position = 'absolute';
+            tooltipEl.style.pointerEvents = 'none';
+            tooltipEl.style.transition = 'all .1s ease';
+            tooltipEl.style.fontSize = '12px';
+            tooltipEl.style.fontFamily = 'Arial, sans-serif';
+            document.body.appendChild(tooltipEl);
           }
+
+          const tooltipModel = context.tooltip;
+          if (tooltipModel.opacity === 0) {
+            tooltipEl.style.opacity = 0;
+            return;
+          }
+
+          const canvasRect = context.chart.canvas.getBoundingClientRect();
+
+          let left = canvasRect.left + window.pageXOffset + tooltipModel.caretX;
+          let top = canvasRect.top + window.pageYOffset + tooltipModel.caretY;
+
+          tooltipEl.style.opacity = 1;
+          tooltipEl.style.left = '0px'; 
+          tooltipEl.style.top = '0px';  
+          tooltipEl.innerHTML = '';  
+
+          const dataIndex = tooltipModel.dataPoints[0].dataIndex;
+          const datasetLabel = tooltipModel.dataPoints[0].dataset.label;
+          const value = tooltipModel.dataPoints[0].parsed.x;
+          const semana = context.chart.data.labels[dataIndex];
+          const hacienda = haciendaSelector.value;
+
+          const container = document.createElement('div');
+
+          if (datasetLabel === 'Rechazados') {
+            const filasCausas = fullData.filter(r =>
+              r.Hacienda === hacienda &&
+              r.Semana === semana &&
+              (!r['Racimos Cosechados'] || r['Racimos Cosechados'] === '')
+            );
+            const totalRechazosSemana = fullData
+              .filter(r => r.Hacienda === hacienda && r.Semana === semana)
+              .reduce((acc, cur) => acc + (+cur['Rechazados'] || 0), 0) || 1;
+
+            const mainLine = document.createElement('div');
+            mainLine.style.display = 'flex';
+            mainLine.style.alignItems = 'center';
+            mainLine.style.fontWeight = 'bold';
+            mainLine.style.color = '#ffc0c0ff';
+            mainLine.style.marginBottom = '6px';
+
+            const colorBox = document.createElement('span');
+            colorBox.style.display = 'inline-block';
+            colorBox.style.width = '12px';
+            colorBox.style.height = '12px';
+            colorBox.style.backgroundColor = 'rgba(255, 99, 132, 0.6)';
+            colorBox.style.marginRight = '8px';
+            colorBox.style.borderRadius = '2px';
+
+            mainLine.appendChild(colorBox);
+            mainLine.appendChild(document.createTextNode(`${datasetLabel}: ${value}`));
+            container.appendChild(mainLine);
+
+            if (filasCausas.length > 0) {
+              const todasLasClaves = Object.keys(filasCausas[0]);
+              const causasPosibles = todasLasClaves.filter(k =>
+                !['Semana', 'Hacienda', 'Racimos Cosechados', 'Procesados', 'Rechazados', 'Cajas', 'Rathio'].includes(k)
+              );
+              const sumaPorCausa = {};
+              for (const fila of filasCausas) {
+                for (const causa of causasPosibles) {
+                  const val = +fila[causa] || 0;
+                  if (val > 0) {
+                    sumaPorCausa[causa] = (sumaPorCausa[causa] || 0) + val;
+                  }
+                }
+              }
+              const ordenado = Object.entries(sumaPorCausa).sort((a, b) => b[1] - a[1]);
+
+              ordenado.forEach(([nombre, val]) => {
+                const porcentaje = ((val / totalRechazosSemana) * 100).toFixed(2);
+
+                const causaLine = document.createElement('div');
+                causaLine.style.fontWeight = 'bold';
+                causaLine.style.color = '#ffffff';
+                causaLine.style.marginBottom = '3px';
+
+                causaLine.textContent = `${nombre}: ${val} `;
+
+                const porcentajeSpan = document.createElement('span');
+                porcentajeSpan.style.fontWeight = 'normal';
+                porcentajeSpan.style.color = '#a5a5a5ff';
+                porcentajeSpan.textContent = `(${porcentaje}%)`;
+
+                causaLine.appendChild(porcentajeSpan);
+                container.appendChild(causaLine);
+              });
+            }
+          } else {
+            container.textContent = `${datasetLabel}: ${value}`;
+            container.style.color = '#ffffff';
+            container.style.fontWeight = 'bold';
+          }
+
+          tooltipEl.appendChild(container);
+
+          const tooltipRect = tooltipEl.getBoundingClientRect();
+          const padding = 10;
+
+          if (left + tooltipRect.width + padding > window.pageXOffset + window.innerWidth) {
+            left = window.pageXOffset + window.innerWidth - tooltipRect.width - padding;
+          }
+          if (top + tooltipRect.height + padding > window.pageYOffset + window.innerHeight) {
+            top = top - tooltipRect.height - padding;
+            if (top < window.pageYOffset) top = window.pageYOffset + padding;
+          }
+          if (left < window.pageXOffset + padding) {
+            left = window.pageXOffset + padding;
+          }
+          if (top < window.pageYOffset + padding) {
+            top = window.pageYOffset + padding;
+          }
+
+          tooltipEl.style.left = left + 'px';
+          tooltipEl.style.top = top + 'px';
         }
-        const ordenado = Object.entries(sumaPorCausa).sort((a, b) => b[1] - a[1]);
-
-        ordenado.forEach(([nombre, val]) => {
-          const porcentaje = ((val / totalRechazosSemana) * 100).toFixed(2);
-
-          const causaLine = document.createElement('div');
-          causaLine.style.fontWeight = 'bold';
-          causaLine.style.color = '#ffffff';
-          causaLine.style.marginBottom = '3px'; // espacio entre causas
-
-          causaLine.textContent = `${nombre}: ${val} `;
-
-          const porcentajeSpan = document.createElement('span');
-          porcentajeSpan.style.fontWeight = 'normal';
-          porcentajeSpan.style.color = '#a5a5a5ff';
-          porcentajeSpan.textContent = `(${porcentaje}%)`;
-
-          causaLine.appendChild(porcentajeSpan);
-          container.appendChild(causaLine);
-        });
       }
-
-      tooltipEl.appendChild(container);
-    } else {
-      // Tooltip normal para otras datasets
-      tooltipEl.textContent = `${datasetLabel}: ${value}`;
-      tooltipEl.style.color = '#ffffff';
-      tooltipEl.style.fontWeight = 'bold';
-    }
-  }
-}
     },
-
+    
       scales: {
         x: {
           beginAtZero: true,
@@ -419,12 +407,6 @@ function createCharts() {
           barPercentage: 3.8,
         }}},
     plugins: [ChartDataLabels]});
-
-
-
-
-
-    
 
   cajasChart = new Chart(cajasCtx, {
     type: 'bar',
