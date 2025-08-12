@@ -161,7 +161,7 @@ if (len >= 2) {
 
     resumenCajas.forEach(({ hacienda, totalCajas }) => {
       const li = document.createElement('li');
-      li.textContent = `${hacienda}: ${totalCajas.toLocaleString()} cajas`;
+      li.textContent = `${hacienda}: ${totalCajas.toLocaleString()}`;
 
       if (hacienda === selectedHacienda) {
         li.classList.add('selected-hacienda');
