@@ -402,7 +402,7 @@ canvas { height: 100% !important; }
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  animation: gradientMove 20s linear infinite;
+  animation: gradientMove 15s linear infinite;
 }
 
 @keyframes gradientMove {
