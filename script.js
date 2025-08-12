@@ -116,7 +116,7 @@ function generarResumen(hacienda, semana = 'Todas') {
 
 
 
-  // GENERA RESUMEN DE TENDECIA ULTIMA (-) PENULTIMA CAJA***********
+  // GENERA RESUMEN DE TENDECIA 📈 ULTIMA (-) PENULTIMA CAJA***********
   const cajasOrdenadas = datosHacienda
   .sort((a, b) => parseInt(a.Semana) - parseInt(b.Semana))
   .map(r => +r.Cajas || 0);
@@ -137,51 +137,38 @@ if (len >= 2) {
 
 
 
- // GENERA TABLA CONSOLIDADA DE CAJAS GLOBALES***********
+ // 𝄜 GENERA TABLA CONSOLIDADA DE CAJAS GLOBALES***********
   function generarResumenCajas(semana = 'Todas') {
     const selectedHacienda = haciendaSelector.value;
     const haciendasUnicas = [...new Set(fullData.map(r => r.Hacienda).filter(h => h && h.trim() !== ''))];
-
     const resumenCajas = haciendasUnicas.map(hacienda => {
       let datosHacienda = fullData.filter(r => r.Hacienda === hacienda);
-
       if (semana !== 'Todas') {
         datosHacienda = datosHacienda.filter(r => r.Semana === semana);
       }
-
       const totalCajas = datosHacienda.reduce((acc, cur) => acc + (+cur['Cajas'] || 0), 0);
-
       return { hacienda, totalCajas };
     });
-
     resumenCajas.sort((a, b) => b.totalCajas - a.totalCajas);
-
     const ol = document.getElementById('cajasFincas');
     ol.innerHTML = '';
-
     resumenCajas.forEach(({ hacienda, totalCajas }) => {
       const li = document.createElement('li');
       li.textContent = `${hacienda}: ${totalCajas.toLocaleString()}`;
-
       if (hacienda === selectedHacienda) {
         li.classList.add('selected-hacienda');
       } else {
         li.classList.remove('selected-hacienda');
       }
-
       ol.appendChild(li);
     });
-
     const produccionElOro = resumenCajas
       .filter(r => r.hacienda !== 'AGRO&SOL')
       .reduce((acc, cur) => acc + cur.totalCajas, 0);
-
     const produccionPeninsula = resumenCajas
       .filter(r => r.hacienda === 'AGRO&SOL')
       .reduce((acc, cur) => acc + cur.totalCajas, 0);
-
     const produccionGlobal = produccionElOro + produccionPeninsula;
-
     const resumenTabla = `
     <div class="tabla-resumen-contenido">
       <div class="tabla-item">
@@ -198,46 +185,27 @@ if (len >= 2) {
       </div>
     </div>
   `;
-
     const resumenDiv = document.getElementById('tablaResumen');
     resumenDiv.innerHTML = resumenTabla;
   }
-
   document.getElementById('filtroSemanaCajas').addEventListener('change', e => {
     generarResumenCajas(e.target.value);
   });
-
   function llenarFiltroSemanaCajas() {
     const select = document.getElementById('filtroSemanaCajas');
     const semanasUnicas = [...new Set(
       fullData.map(r => r.Semana).filter(sem => sem !== null && sem !== undefined && sem.toString().trim() !== '')
     )].sort((a, b) => parseInt(a) - parseInt(b));
-
     select.querySelectorAll('option:not([value="Todas"])').forEach(opt => opt.remove());
-
     semanasUnicas.forEach(sem => {
       const option = document.createElement('option');
       option.value = sem;
       option.textContent = `Semana ${sem}`;
-      select.appendChild(option);
-    });
-  }
-
+      select.appendChild(option);});}
   llenarFiltroSemanaCajas();
   generarResumenCajas();
 
 
-
-
-
-
-
-
-
-
-
-
-  
 
 
 

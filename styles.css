@@ -275,16 +275,22 @@ canvas { height: 100% !important; }
   display: flex;
   gap: 20px;
   align-items: flex-start;
+  /* opcional: para que bajen a la siguiente línea si no hay espacio suficiente */
+  flex-wrap: wrap;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-#cajasFincas {
-  max-width: 300px;   /* controla que no se haga muy ancha */
+#cajasFincas,
+#tablaResumen {
+  flex: 1 1 0;          /* igual ancho flexible */
+  max-width: 50%;       /* máximo la mitad del contenedor cada uno */
+  box-sizing: border-box;
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
-  margin: 0;
-  padding-right: 10px;
-  border-right: 1px solid #ccc;
+  margin-top: -10px; /* moverla 10px hacia arriba */
+  margin-bottom: 20px;
 }
 
 .tabla-resumen {
