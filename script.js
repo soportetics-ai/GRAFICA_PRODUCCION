@@ -16,11 +16,24 @@ resumenBtn.addEventListener('click', () => {
   if (magicLoader) magicLoader.classList.remove('hidden');
   setTimeout(() => {
     if (magicLoader) magicLoader.classList.add('hidden');
+
+    // Ocultar tooltip custom de Chart.js si existe
+    const tooltipEl = document.getElementById('chartjs-tooltip');
+    if (tooltipEl) {
+      tooltipEl.style.opacity = 0;
+      tooltipEl.style.left = '-9999px';
+      tooltipEl.style.top = '-9999px';
+    }
+
+    // Scroll al tope de la página
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     nombreHaciendaResumen.textContent = hacienda;
     document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
     resumenSection.style.display = 'block';
-    generarResumen(hacienda);}, 1500);
-});
+    generarResumen(hacienda);
+  }, 1500);
+});;
 
 // PARAMETROS ( LYDAS )***********
 function semanaAMes(semana) {
