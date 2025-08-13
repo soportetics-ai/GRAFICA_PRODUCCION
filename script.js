@@ -181,8 +181,7 @@ function generarResumen(hacienda, semana = 'Todas') {
       "VAQUERIA": 61.4,
       "ESTRELLITA": 16.65,
       "PRIMAVERA": 67,
-      "AGRO&SOL": 378
-    };
+      "AGRO&SOL": 378 };
     const resumenPosicion = haciendasUnicas.map(hacienda => {
       let datosHacienda = fullData.filter(r => r.Hacienda === hacienda);
       if (semana !== 'Todas') {
