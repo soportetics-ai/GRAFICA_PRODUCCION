@@ -1,5 +1,9 @@
 
-body { font-family: sans-serif; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  margin: 0;
+  padding: 0;
+}
 
 .sticky-header { 
   position: sticky; 
@@ -176,7 +180,6 @@ canvas { height: 100% !important; }
 
 .resumen-bloque h3 {
   margin-top: 0;
-  color: #333;
 }
 
 #rankingFincas {
@@ -409,3 +412,76 @@ canvas { height: 100% !important; }
     background-position: 400% 0%;
   }
 }
+
+/* --- MODO OSCURO --- */
+body.dark-mode {
+  background: #181818;
+  color: #f5f5f5;
+}
+
+body.dark-mode .sticky-header {
+  background: #23242e;
+  color: #f5f5f5;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+  border-bottom: 1px solid #444;
+}
+
+body.dark-mode .tab {
+  background: #23242e;
+  color: #f5f5f5;
+  border-bottom: 1px solid #444;
+}
+
+body.dark-mode .tab.active {
+  background: #33384d;
+  color: #ffe066;
+}
+
+body.dark-mode .tab-content {
+  background: #23242e;
+  color: #f5f5f5;
+}
+
+body.dark-mode #resumenSection {
+  background: #23242e;
+  color: #f5f5f5;
+}
+
+body.dark-mode .resumen-bloque {
+  background: #181818;
+  color: #f5f5f5;
+  border: 1px solid #444;
+  box-shadow: 0 5px 5px rgba(0,0,0,0.15);
+}
+
+body.dark-mode #tablaResumen,
+body.dark-mode .tabla-resumen {
+  background: #23242e;
+  color: #ffe066;
+  border: 1px solid #444;
+}
+
+body.dark-mode select,
+body.dark-mode #haciendaSelector {
+  background: #23242e;
+  color: #ffe066;
+  border: 1px solid #444;
+}
+
+body.dark-mode label,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode p,
+body.dark-mode li {
+  color: #ffe066;
+}
+
+body.dark-mode #modal-content {
+  background: #23242e;
+  color: #ffe066;
+}
+
+body.dark-mode .magic-wand-btn .magic-label {
+  color: #ffe066;
+}
+

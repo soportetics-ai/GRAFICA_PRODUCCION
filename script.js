@@ -6,54 +6,30 @@ const resumenSection = document.getElementById('resumenSection');
 const nombreHaciendaResumen = document.getElementById('nombreHaciendaResumen');
 const racimosCtx = document.getElementById('racimosChart').getContext('2d');
 const cajasCtx = document.getElementById('cajasChart').getContext('2d');
-let racimosChart, cajasChart;
-let fullData = [];
-let visibilidadRacimos = {};
-
-// --- NUEVO: datos del endpoint de Racimos Cosechados (para tooltips)
-// Variable global que almacenará la tabla del apiResumenUrl
-let datosCosechados = [];
-
-// Función para cargar datos desde apiResumenUrl
-function cargarCosechados() {
-  fetch(apiResumenUrl)
-    .then(res => res.json())
-    .then(data => {
-      datosCosechados = Array.isArray(data) ? data : [];
-    })
-    .catch(err => {
-      console.error("Error cargando datos de racimos cosechados:", err);
-      datosCosechados = [];
-    });
+let racimosChart, cajasChart;let fullData = [];let visibilidadRacimos = {};let datosCosechados = [];function cargarCosechados() {
+  fetch(apiResumenUrl).then(res => res.json()).then(data => {datosCosechados = Array.isArray(data) ? data : [];}).catch(err => {console.error("Error cargando datos de racimos cosechados:", err);datosCosechados = [];});
 }
-
-// --- fin NUEVO
-
 resumenBtn.addEventListener('click', () => {
   const hacienda = haciendaSelector.value;
   const magicLoader = document.getElementById('magic-loader');
   if (magicLoader) magicLoader.classList.remove('hidden');
   setTimeout(() => {
     if (magicLoader) magicLoader.classList.add('hidden');
-
-    // Ocultar tooltip custom de Chart.js si existe
     const tooltipEl = document.getElementById('chartjs-tooltip');
     if (tooltipEl) {
       tooltipEl.style.opacity = 0;
       tooltipEl.style.left = '-9999px';
-      tooltipEl.style.top = '-9999px';
-    }
-
-    // Scroll al tope de la página
+      tooltipEl.style.top = '-9999px';}
     window.scrollTo({ top: 0, behavior: 'smooth' });
-
     nombreHaciendaResumen.textContent = hacienda;
     document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
     resumenSection.style.display = 'block';
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    generarResumen(hacienda);
-  }, 1500);
-});;
+    generarResumen(hacienda);}, 1500);});;
+
+
+
+
 
 // PARAMETROS ( LYDAS )***********
 function semanaAMes(semana) {
@@ -73,19 +49,9 @@ function semanaAMes(semana) {
   else return 'Desconocido';
 }
 const semanasEsperadasPorMes = {
-  'Enero': 5,
-  'Febrero': 4,
-  'Marzo': 4,
-  'Abril': 4,
-  'Mayo': 4,
-  'Junio': 5,
-  'Julio': 4,
-  'Agosto': 5,
-  'Septiembre': 4,
-  'Octubre': 4,
-  'Noviembre': 4,
-  'Diciembre': 5
-};
+  'Enero': 5,'Febrero': 4,'Marzo': 4,'Abril': 4,'Mayo': 4,'Junio': 5,'Julio': 4,'Agosto': 5,'Septiembre': 4,'Octubre': 4,'Noviembre': 4,'Diciembre': 5};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
 
 
 // GENERA RESUMEN DE MES Y SEMANA MAS PRODUCTIVOS 📅📦***********
@@ -129,7 +95,7 @@ function generarResumen(hacienda, semana = 'Todas') {
   document.getElementById("semanaMasProductiva").textContent = `${semanaMasProd.semana} ( ${semanaMasProd.cajas.toLocaleString()} cajas )`;
   document.getElementById("semanaMenosProductiva").textContent = `${semanaMenosProd.semana} ( ${semanaMenosProd.cajas.toLocaleString()} cajas )`;
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
 
 
   // GENERA RESUMEN DE TENDECIA 📈 ULTIMA (-) PENULTIMA CAJA***********
@@ -146,7 +112,7 @@ if (len >= 2) {
   document.getElementById("tendenciaHacienda").textContent = tendencia;} else {
   document.getElementById("tendenciaHacienda").textContent = 'Datos insuficientes para tendencia';}
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
 
 
 
@@ -160,11 +126,9 @@ if (len >= 2) {
     const resumenCajas = haciendasUnicas.map(hacienda => {
       let datosHacienda = fullData.filter(r => r.Hacienda === hacienda);
       if (semana !== 'Todas') {
-        datosHacienda = datosHacienda.filter(r => r.Semana === semana);
-      }
+        datosHacienda = datosHacienda.filter(r => r.Semana === semana);}
       const totalCajas = datosHacienda.reduce((acc, cur) => acc + (+cur['Cajas'] || 0), 0);
-      return { hacienda, totalCajas };
-    });
+      return { hacienda, totalCajas };});
     resumenCajas.sort((a, b) => b.totalCajas - a.totalCajas);
     const ol = document.getElementById('cajasFincas');
     ol.innerHTML = '';
@@ -221,7 +185,7 @@ if (len >= 2) {
   llenarFiltroSemanaCajas();
   generarResumenCajas();
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
 
 
 
@@ -300,7 +264,7 @@ function llenarFiltroSemanaPosicion() {
   });
 }
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
 
 
 
@@ -348,13 +312,13 @@ function llenarFiltroSemana() {
   });
 }
 
-
-
-
-
-
-
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
 
 
 
@@ -363,16 +327,11 @@ function llenarFiltroSemana() {
 // 📊📊📊📊📊📊 SCRIPT CHART ( GRAFICO DE BARRAS ) 📊📊📊📊📊📊📊
 function createCharts() {
   racimosChart = new Chart(racimosCtx, {type: 'bar',data: { labels: [], datasets: [] },options: {indexAxis: 'y',responsive: true,maintainAspectRatio: false,layout: {padding: { top: 0, bottom: 0 }},
-      plugins: {
-        legend: { position: 'top' },datalabels: { anchor: 'end', align: 'right', color: 'black', font: { weight: 'bold', size: 12 } },
-
-
+      plugins: {legend: { position: 'top' },datalabels: { anchor: 'end', align: 'right', color: 'black', font: { weight: 'bold', size: 12 } },
 
       tooltip: {
-        enabled: false,
-        external: function (context) {
+        enabled: false,external: function (context) {
           let tooltipEl = document.getElementById('chartjs-tooltip');
-
           if (!tooltipEl) {
             tooltipEl = document.createElement('div');
             tooltipEl.id = 'chartjs-tooltip';
@@ -683,10 +642,25 @@ if (!anyDetalle) {
       maintainAspectRatio: false,
       plugins: {
         legend: { position: 'top' },
-        datalabels: { anchor: 'end',align: 'right',color: 'black',font: { weight: 'bold' }}
+        datalabels: {
+          anchor: 'end',
+          align: 'right',
+          color: function(context) {
+            // Cambia el color solo para la barra "RATHIO"
+            if (context.dataset.label === 'RATHIO') {
+              // Detecta modo oscuro
+              return document.body.classList.contains('dark-mode') ? '#ffe066' : '#b8860b';
+            }
+            // Color para otras barras
+            return document.body.classList.contains('dark-mode') ? '#f5f5f5' : 'black';
+          },
+          font: { weight: 'bold' }
+        }
       },
-      scales: { x: { beginAtZero: true } }},
-    plugins: [ChartDataLabels]});
+      scales: { x: { beginAtZero: true } }
+    },
+    plugins: [ChartDataLabels]
+});
 }
 
 
@@ -880,3 +854,7 @@ function obtenerColorPorSemanaYEdad(semana, edad) {
   const colorNombre = coloresBase[colorIndex];
   return coloresMap[colorNombre] || '#000000'; // fallback negro
 }
+
+
+
+
