@@ -121,9 +121,9 @@ function generarResumen(hacienda, semana = 'Todas') {
     const haciendasUnicas = [...new Set(fullData.map(r => r.Hacienda).filter(h => h && h.trim() !== ''))];
     const resumenCajas = haciendasUnicas.map(hacienda => {
       let datosHacienda = fullData.filter(r => r.Hacienda === hacienda);
-      if (semana !== 'Todas') {
+      if (semana !== 'Todas')
         datosHacienda = datosHacienda.filter(r => r.Semana === semana);
-      }
+  
       const totalCajas = datosHacienda.reduce((acc, cur) => acc + (+cur['Cajas'] || 0), 0);
       return { hacienda, totalCajas };
     });
@@ -132,7 +132,7 @@ function generarResumen(hacienda, semana = 'Todas') {
     resumenCajas.forEach(({ hacienda, totalCajas }) => {
       const li = document.createElement('li');
       li.textContent = `${hacienda}: ${totalCajas.toLocaleString()}`;
-      if (hacienda === selectedHacienda) { li.classList.add('selected-hacienda'); } else { li.classList.remove('selected-hacienda'); }
+      li.classList.toggle('selected-hacienda', hacienda === selectedHacienda);
       ol.appendChild(li);
     });
     const produccionElOro = resumenCajas
@@ -145,8 +145,7 @@ function generarResumen(hacienda, semana = 'Todas') {
     document.getElementById('cajasElOro').textContent = `${produccionElOro.toLocaleString()} cajas`;
     document.getElementById('cajasPeninsula').textContent = `${produccionPeninsula.toLocaleString()} cajas`;
     document.getElementById('cajasGlobal').textContent = `${produccionGlobal.toLocaleString()} cajas`;
-    const resumenDiv = document.getElementById('tablaResumen');
-    resumenDiv.innerHTML = resumenTabla;
+    
   }
   document.getElementById('filtroSemanaCajas').addEventListener('change', e => {
     generarResumenCajas(e.target.value);
