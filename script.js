@@ -632,15 +632,12 @@ function updateCharts(data) {
 
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
-    // Ocultar tooltip custom de Chart.js si existe
     const tooltipEl = document.getElementById('chartjs-tooltip');
     if (tooltipEl) {
       tooltipEl.style.opacity = 0;
-      tooltipEl.style.left = '-9999px';  // Moverlo fuera de pantalla
+      tooltipEl.style.left = '-9999px';
       tooltipEl.style.top = '-9999px';
     }
-
-    // Ocultar resumen y tabs como ya tienes
     resumenSection.style.display = 'none';
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
@@ -649,7 +646,6 @@ document.querySelectorAll('.tab').forEach(tab => {
     const targetId = tab.getAttribute('data-tab');
     document.getElementById(targetId).style.display = 'block';
 
-    // Scroll al tope de la página o del contenedor
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 });
@@ -713,22 +709,19 @@ const coloresMap = {
 };
 
 /**
- * Obtiene el color para un racimo de cierta edad en una semana dada.
  * @param {number} semana - número de semana (ej. 1, 2, 3...)
  * @param {number} edad - edad del racimo (de 8 a 15)
  * @returns {string} - color en formato HEX
  */
 function obtenerColorPorSemanaYEdad(semana, edad) {
-  if (edad < 8 || edad > 15) return '#888888'; // color gris para edades inválidas o S/C
+  if (edad < 8 || edad > 15) return '#888888';
 
   const baseIndex = edad - 8; // índice 0..7
   const desplazamiento = (semana - 1) % 8; // ciclo de 8 semanas
-
-  // calcula el índice del color cíclico para esta semana y edad
   const colorIndex = (baseIndex - desplazamiento + 8) % 8;
 
   const colorNombre = coloresBase[colorIndex];
-  return coloresMap[colorNombre] || '#000000'; // fallback negro
+  return coloresMap[colorNombre] || '#000000';
 }
 
 
