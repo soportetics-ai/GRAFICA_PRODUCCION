@@ -148,79 +148,68 @@ body {
 /* CUEPO SECCION:  RESUMEN   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 /* Diseño*/
 #resumenSection {
-  background-color: #f7f7f7;
+  position: relative;
+  padding: 20px 15px;
   max-width: 600px;
   margin: 0 auto;
-  padding: 20px 15px;
-  box-sizing: border-box;
+  border-radius: 16px;
   font-family: inherit;
   font-size: 14px;
   color: #1c1c1e;
   line-height: 1.5;
   display: none;
+  overflow: hidden;
+  z-index: 0;
+
+  /* Fondo con imagen de campo */
+  background: url('img/campo.jpg') no-repeat center center;
+  background-size: cover;
 }
-/* Titulo Principal:  Resumen de Hacienda: (hacienda)*/
+
+/* Bloques resumen con efecto Liquid Glass estático */
+.resumen-bloque {
+  position: relative;
+  border-radius: 16px;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0);
+  border: 1px solid rgba(255,255,255,0.35);
+  backdrop-filter: blur(10px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6);
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+/* Hover ligero para resaltar */
+.resumen-bloque:hover {
+  background: rgba(255,255,255,0.22);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.12), inset 0 2px 0 rgba(255,255,255,0.6);
+}
+
+/* Titulos y texto */
 #resumenSection h2 {
   font-size: 15px;
   font-weight: 600;
   margin-bottom: 12px;
 }
-/* Subtitulos de Bloques:  Mes📅, Semana📅, Cajas📦, Posicion🏆, Rechazados🚯, Tendencia📈*/
 #resumenSection h3 {
   font-size: 16px;
   font-weight: 500;
   margin-bottom: 6px;
   margin-top: 18px;
 }
-/* Distancia del borde izquierdo de texto en bloques: Cajas📦, Posicion🏆, Rechazados🚯, Tendencia📈*/
+
+/* Listados dentro de bloques */
 #resumenSection ol {
   padding-left: 20px;
 }
-/* Distancia de margen texto Bloque Cajas📦:  Haciendas: 100*/
 #resumenSection li {
   margin-bottom: 4px;
-}
-/* Estructura de bloques: Cajas📦, Posicion🏆, Rechazados🚯, Tendencia📈*/
-.resumen-bloque {
-  border: 1px solid #f0f0f0;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  background-color: #ffffff;
-  box-shadow: 0 5px 5px rgba(65, 65, 65, 0.167);
-  max-height: 400px;
-  padding: 5px 10px;
   font-size: 13px;
 }
-/* Bloque Cajas📦: DIV SEPARADOR DE SubBloque CAJAS | PRODUCCION GLOBAL  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-#resumen-cajas ol#cajasFincas {
-  max-width: 300px;
-  overflow-y: auto;
-  border-right: 1px solid #ccc;
-  padding-right: 10px;
-}
-/* Añade un padding para centrar divisor SubBloque: Cajas*/
-#cajasFincas,
-#tablaResumen {
-  flex: 1 1 0;
-  max-width: 50%;
-  box-sizing: border-box;
-  overflow-wrap: break-word;
-  word-break: break-word;
-  margin-top: -10px;
-  margin-bottom: 20px;
-}
-/* Formato de texto SubBloque: Cajas*/
-#cajasFincas li {
-  font-size: 13px;
-  padding: 4px 0;
-  color: #bbbbbb;
-}
-/* RESALTA NEGRITA Finca Seleccionada SubBloque: Cajas*/
-#cajasFincas li.selected-hacienda {
-  color: #000000;
-  font-weight: bold;
-}
-/* Insercion de TABLA al SubBloque: PRODUCCION GLOBAL*/
+
+/* SubBloque Cajas 📦 */
 .contenedor-cajas-flex {
   display: flex;
   gap: 20px;
@@ -229,31 +218,26 @@ body {
   max-width: 100%;
   box-sizing: border-box;
 }
-/* Diseño de TABLA en SubBloque: PRODUCCION GLOBAL*/
 .tabla-resumen-contenido {
   margin-top: 0px;
   padding: 15px;
   font-size: 13px;
   box-sizing: border-box;
-  background: #c7c7c71c;
+  background: rgba(255,255,255,0.12);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(112, 112, 112, 0.557);
-  font-family: inherit;
-  color: #1c1c1e;
-  letter-spacing: normal;
-  line-height: 1.0;
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.35);
 }
-/* Lineas Separadoras de TABLA en SubBloque: PRODUCCION GLOBAL*/
 .tabla-resumen-contenido .tabla-item {
   margin-bottom: 12px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #d6d6d6;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
 }
 .tabla-resumen-contenido .tabla-item:last-child {
   margin-bottom: 10px;
   border-bottom: none;
 }
-/* Formato de texto de TABLA en SubBloque: PRODUCCION GLOBAL*/
 .tabla-resumen-contenido strong {
   display: block;
   font-weight: 600;
@@ -266,19 +250,25 @@ body {
   font-weight: 500;
 }
 
-/* Diseño de SELECTORES: Filtrar por semana: Todas  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
+/* Selectores con efecto Liquid Glass */
 #resumenSection select {
-  border-radius: 8px;
-  padding: 2px 8px;
-  height: 20px;
-  border: 1px solid #ccc;
-  background-color: #fff;
+  border-radius: 12px;
+  padding: 4px 10px;
+  height: 24px;
+  border: 1px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
   font-size: 12px;
+  transition: all 0.3s ease;
 }
 #resumenSection select:hover {
-  border-color: #69beff;
-  box-shadow: 0 0 5px rgba(187, 163, 86, 0.4);
+  background: rgba(255,255,255,0.25);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.4);
+  border-color: rgba(255,255,255,0.5);
 }
+
+
 
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
