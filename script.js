@@ -89,7 +89,7 @@ const selector = document.getElementById('haciendaSelector');
 const logo = document.getElementById('logoFinca');
 
 selector.addEventListener('change', () => {
-  if (selector.value === 'AGRO&SOL') {
+  if (selector.value === 'AGRO&SOL' || selector.value === 'MARIA') {
     logo.src = 'img/logokra.png';
   } else {
     logo.src = 'img/logotec.png';
