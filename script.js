@@ -29,6 +29,23 @@ resumenBtn.addEventListener('click', () => {
 
 
 
+
+
+const tabs = document.querySelectorAll('.tab');
+const slider = document.querySelector('.tab-slider');
+
+tabs.forEach((tab, index) => {
+  tab.addEventListener('click', () => {
+    document.querySelector('.tab.active').classList.remove('active');
+    tab.classList.add('active');
+
+    // mover el slider al tab correspondiente
+    slider.style.transform = `translateX(${index * 100}%)`;
+  });
+});
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
 
 // PARAMETROS ( LYDAS )***********
@@ -289,11 +306,12 @@ function llenarFiltroSemana() {
 
 // 📊📊📊📊📊📊 SCRIPT CHART ( GRAFICO DE BARRAS ) 📊📊📊📊📊📊📊
 function createCharts() {
-  racimosChart = new Chart(racimosCtx, {
-    type: 'bar', data: { labels: [], datasets: [] }, options: {
-      indexAxis: 'y', responsive: true, maintainAspectRatio: false, layout: { padding: { top: 0, bottom: 0 } },
-      plugins: {
-        legend: { position: 'top' }, datalabels: { anchor: 'end', align: 'right', color: 'black', font: { weight: 'bold', size: 12 } },
+  racimosChart = new Chart(racimosCtx, {type: 'bar',
+      data: { labels: [], datasets: [] },
+      options: {indexAxis: 'y', responsive: true, maintainAspectRatio: false, layout: { padding: { top: 0, bottom: 0 } },
+      plugins: {legend: { position: 'top' }, datalabels: { anchor: 'end', align: 'right', color: 'black', font: { weight: 'bold', size: 12 } },
+
+        
 
         tooltip: {
           enabled: false, external: function (context) {
