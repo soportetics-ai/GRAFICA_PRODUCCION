@@ -29,23 +29,6 @@ resumenBtn.addEventListener('click', () => {
 
 
 
-
-
-const tabs = document.querySelectorAll('.tab');
-const slider = document.querySelector('.tab-slider');
-
-tabs.forEach((tab, index) => {
-  tab.addEventListener('click', () => {
-    document.querySelector('.tab.active').classList.remove('active');
-    tab.classList.add('active');
-
-    // mover el slider al tab correspondiente
-    slider.style.transform = `translateX(${index * 100}%)`;
-  });
-});
-
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
 
 // PARAMETROS ( LYDAS )***********
@@ -70,6 +53,34 @@ const semanasEsperadasPorMes = {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+
+
+const tabs = document.querySelectorAll('.tabs .tab');
+let slider = document.querySelector('.tab-slider');
+
+// Crear slider solo si no existe
+if (!slider) {
+  slider = document.createElement('div');
+  slider.classList.add('tab-slider');
+  document.querySelector('.tabs').appendChild(slider);
+}
+
+// Posición inicial del slider
+slider.style.transform = `translateX(0%)`;
+
+tabs.forEach((tab, index) => {
+  tab.addEventListener('click', () => {
+    // Cambiar tab activo
+    document.querySelector('.tabs .tab.active').classList.remove('active');
+    tab.classList.add('active');
+
+    // Mover slider al tab correspondiente
+    slider.style.transform = `translateX(${index * 100}%)`;
+
+    // Aquí puedes llamar a tu función para actualizar charts
+    // showTab(tab.dataset.tab);
+  });
+});
 
 
 // GENERA RESUMEN DE MES Y SEMANA MAS PRODUCTIVOS 📅📦***********
