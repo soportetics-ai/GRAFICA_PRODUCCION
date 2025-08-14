@@ -43,22 +43,22 @@ body {
 }
 
 /* BOTONES  RACIMOS 🍌 ||  CAJAS 📦  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-/* Diseño*/
+/* Bloque Principal*/
 .tabs {
-  position: relative;       /* necesario para el slider */
+  position: relative;
   display: flex;
   justify-content: center;
   margin-top: 10px;
-  background: #e0e0e0;      /* bloque gris principal */
+  background: #e8e8e8;
   border-radius: 10px;
-  padding: 3px;             /* espacio interno para slider */
+  padding: 3px;
   box-shadow: 0 2px 5px rgba(157, 157, 157, 0.557);
 }
-
+/* Bloque Interno (deslizante)*/
 .tab {
   flex: 1;
   text-align: center;
-  z-index: 2;               /* para que el texto esté sobre el slider */
+  z-index: 2;
   cursor: pointer;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-weight: 600;
@@ -67,16 +67,14 @@ body {
   line-height: 30px;        /* centra verticalmente */
   transition: color 0.3s;
 }
-
 .tab.active {
   color: #000;
 }
-
 .tab-slider {
   position: absolute;
   top: 3px;
   left: 0;
-  width: calc(50% - 6px);   /* ancho del slider menos márgenes */
+  width: calc(50% - 6px);
   height: calc(100% - 6px);
   margin: 0 3px;             /* margen lateral interno */
   background: #ffffff;       /* bloque blanco */
@@ -150,7 +148,7 @@ body {
 /* CUEPO SECCION:  RESUMEN   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 /* Diseño*/
 #resumenSection {
-  background-color: rgb(249, 244, 244);
+  background-color: #fbfafd;
   max-width: 600px;
   margin: 0 auto;
   padding: 20px 15px;
@@ -184,11 +182,11 @@ body {
 }
 /* Estructura de bloques: Cajas📦, Posicion🏆, Rechazados🚯, Tendencia📈*/
 .resumen-bloque {
-  border: 1px solid #ddd;
+  border: 1px solid #f0f0f0;
   border-radius: 10px;
   margin-bottom: 20px;
   background-color: #ffffff;
-  box-shadow: 0 5px 5px rgba(0,0,0,0.05);
+  box-shadow: 0 5px 5px rgba(65, 65, 65, 0.167);
   max-height: 400px;
   padding: 5px 10px;
   font-size: 13px;
