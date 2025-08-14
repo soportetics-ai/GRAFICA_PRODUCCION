@@ -16,31 +16,35 @@
 
 <!-- 𝄜 ENCABEZADOS ( FILTRO-HACIENDA /  RESUMEN  /  RACIMOS   / CAJAS ) -->  
   <div class="sticky-header">
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <img src="img/LOGO.png" alt="Logo" style="height: 30px; width: auto;" />
-          <select id="haciendaSelector">
-              <option value="MARIA">MARIA</option>
-              <option value="PORVENIR">PORVENIR</option>
-              <option value="ESPERANZA">ESPERANZA</option>
-              <option value="EL CISNE">EL CISNE</option>
-              <option value="VAQUERIA">VAQUERIA</option>
-              <option value="ESTRELLITA">ESTRELLITA</option>
-              <option value="PRIMAVERA">PRIMAVERA</option>
-              <option value="AGRO&SOL">AGRO&SOL</option>
-          </select>
-      <span style="font-size: 0.60rem; color: #b8b19a; ">version 2.0 (Desarrollo) </span>
+  <div style="display: flex; align-items: center; gap: 8px;">
+      <!-- Logo dinámico -->
+      <img id="logoFinca" src="img/logotec.png" alt="Logo" style="height: 30px; width: auto;" />
+      
+      <select id="haciendaSelector">
+          <option value="MARIA">MARIA</option>
+          <option value="PORVENIR">PORVENIR</option>
+          <option value="ESPERANZA">ESPERANZA</option>
+          <option value="EL CISNE">EL CISNE</option>
+          <option value="VAQUERIA">VAQUERIA</option>
+          <option value="ESTRELLITA">ESTRELLITA</option>
+          <option value="PRIMAVERA">PRIMAVERA</option>
+          <option value="AGRO&SOL">AGRO&SOL</option>
+      </select>
+      <span style="font-size: 0.60rem; color: #bba356; font-weight: bold">beta </span>
+  </div>
+
+  <button class="magic-wand-btn" id="resumenBtn" title="Generar Resumen Inteligente" aria-label="Generar Resumen Inteligente">
+    <span class="resumen-animado">Resumen</span> <img src="img/varita-magica.png" alt="Varita" />
+  </button>
+
+  <div class="tabs-container">
+    <div class="tabs">
+      <div class="tab active" data-tab="racimos">RACIMOS 🍌</div>
+      <div class="tab" data-tab="cajas">CAJAS 📦</div>
+      <div class="tab-slider"></div>
     </div>
-    <button class="magic-wand-btn" id="resumenBtn" title="Generar Resumen Inteligente" aria-label="Generar Resumen Inteligente">
-      <span class="resumen-animado">Resumen</span> <img src="img/varita-magica.png" alt="Varita" />
-    </button>
-    <div class="tabs-container">
-  <div class="tabs">
-    <div class="tab active" data-tab="racimos">RACIMOS 🍌</div>
-    <div class="tab" data-tab="cajas">CAJAS 📦</div>
-    <div class="tab-slider"></div>
   </div>
 </div>
-  </div>
 
 <!--////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->  
 

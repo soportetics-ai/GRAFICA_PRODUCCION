@@ -83,6 +83,22 @@ tabs.forEach((tab, index) => {
 });
 
 
+
+
+const selector = document.getElementById('haciendaSelector');
+const logo = document.getElementById('logoFinca');
+
+selector.addEventListener('change', () => {
+  if (selector.value === 'AGRO&SOL') {
+    logo.src = 'img/logokra.png';
+  } else {
+    logo.src = 'img/logotec.png';
+  }
+});
+
+
+
+
 // GENERA RESUMEN DE MES Y SEMANA MAS PRODUCTIVOS 📅📦***********
 function generarResumen(hacienda, semana = 'Todas') {
   let datosHacienda = fullData.filter(r => r.Hacienda === hacienda && r['Cajas'] !== undefined && r['Cajas'] !== '');
