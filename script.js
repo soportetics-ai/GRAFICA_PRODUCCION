@@ -442,12 +442,20 @@ function createCharts() {
               container.appendChild(mainLine);
 
               if (hacienda.toUpperCase() === 'CACAO') {
-                const img = document.createElement('img');
-                img.src = 'img/tuimagen.jpeg'; // ruta de tu imagen
-                img.style.width = '200px';
-                img.style.height = 'auto';
-                img.style.marginTop = '6px';
-                container.appendChild(img);
+    const img = document.createElement('img');
+    img.src = 'img/tuimagen.jpeg'; // ruta de tu imagen
+    img.style.width = '100%';       // ocupa todo el ancho del contenedor
+    img.style.height = '100%';      // ocupa todo el alto del contenedor
+    img.style.objectFit = 'contain'; // mantiene proporción
+    img.style.display = 'block';
+    container.appendChild(img);
+
+    container.style.width = '400px';  // ancho del tooltip
+    container.style.height = '500px'; // alto del tooltip
+    container.style.justifyContent = 'center'; // centra horizontalmente
+    container.style.alignItems = 'center';     // centra verticalmente
+    container.style.whiteSpace = 'normal';
+    container.style.overflow = 'hidden'; // permite que el texto haga wrap
               } else {
                 const coloresBase = [
                   { edad: 8, color: 'black' },
