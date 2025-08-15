@@ -356,19 +356,33 @@ function createCharts() {
             tooltipEl.innerHTML = '';
 
             const dataIndex = tooltipModel.dataPoints[0].dataIndex;
-            const datasetLabel = tooltipModel.dataPoints[0].dataset.label;
+            let datasetLabel = tooltipModel.dataPoints[0].dataset.label;
             const value = tooltipModel.dataPoints[0].parsed.x;
             const semana = context.chart.data.labels[dataIndex];
-            const hacienda = haciendaSelector.value;
+            const hacienda = haciendaSelector.value.toUpperCase();
             const container = document.createElement('div');
 
-            if (datasetLabel === 'Rechazados') {
+            // ===== Ajuste para CACAO: cambio de nombres en tabs y leyenda =====
+            if (hacienda === 'CACAO') {
+              // Cambios de leyenda
+              if (datasetLabel === 'Racimos Cosechados') datasetLabel = 'Quintales Cosechados';
+              if (datasetLabel === 'Procesados') datasetLabel = 'Vendidos';
+              if (datasetLabel === 'Rechazados') datasetLabel = 'Fallo';
+
+              // Cambiar nombres de tabs visibles
+              document.querySelector('.tab[data-tab="racimos"]').textContent = 'QUINTALES 🍌';
+            } else {
+              // Restaurar nombres por defecto si no es CACAO
+              document.querySelector('.tab[data-tab="racimos"]').textContent = 'RACIMOS 🍌';
+            }
+
+            if (datasetLabel === 'Fallo') {
               const filasCausas = fullData.filter(r =>
-                r.Hacienda === hacienda && r.Semana === semana &&
+                r.Hacienda.toUpperCase() === hacienda && r.Semana === semana &&
                 (!r['Racimos Cosechados'] || r['Racimos Cosechados'] === '')
               );
               const totalRechazosSemana = fullData
-                .filter(r => r.Hacienda === hacienda && r.Semana === semana)
+                .filter(r => r.Hacienda.toUpperCase() === hacienda && r.Semana === semana)
                 .reduce((acc, cur) => acc + (+cur['Rechazados'] || 0), 0) || 1;
 
               const mainLine = document.createElement('div');
@@ -420,8 +434,8 @@ function createCharts() {
                   container.appendChild(causaLine);
                 });
               }
-            } else if (datasetLabel === 'Racimos Cosechados') {
-
+            } else {
+              // ===== Tooltip normal o CACAO con imagen =====
               const mainLine = document.createElement('div');
               mainLine.style.display = 'flex';
               mainLine.style.alignItems = 'center';
@@ -441,137 +455,24 @@ function createCharts() {
               mainLine.appendChild(document.createTextNode(`${datasetLabel}: ${value}`));
               container.appendChild(mainLine);
 
-              if (hacienda.toUpperCase() === 'CACAO') {
-    const img = document.createElement('img');
-    img.src = 'img/tuimagen.jpeg'; // ruta de tu imagen
-    img.style.width = '100%';       // ocupa todo el ancho del contenedor
-    img.style.height = '100%';      // ocupa todo el alto del contenedor
-    img.style.objectFit = 'contain'; // mantiene proporción
-    img.style.display = 'block';
-    container.appendChild(img);
+              if (hacienda === 'CACAO') {
+                const img = document.createElement('img');
+                img.src = 'img/tuimagen.jpeg';
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'contain';
+                img.style.display = 'block';
+                container.appendChild(img);
 
-    container.style.width = '400px';  // ancho del tooltip
-    container.style.height = '500px'; // alto del tooltip
-    container.style.justifyContent = 'center'; // centra horizontalmente
-    container.style.alignItems = 'center';     // centra verticalmente
-    container.style.whiteSpace = 'normal';
-    container.style.overflow = 'hidden'; // permite que el texto haga wrap
-              } else {
-                const coloresBase = [
-                  { edad: 8, color: 'black' },
-                  { edad: 9, color: 'white' },
-                  { edad: 10, color: 'blue' },
-                  { edad: 11, color: 'green' },
-                  { edad: 12, color: 'yellow' },
-                  { edad: 13, color: 'brown' },
-                  { edad: 14, color: 'red' },
-                  { edad: 15, color: 'purple' }
-                ];
-
-                const semanaNum = parseInt(semana.replace(/\D/g, ''), 10);
-                const desplazamiento = ((semanaNum - 1) % 8);
-                const fila = datosCosechados.find(f =>
-                  String(f.Hacienda).trim() === String(hacienda).trim() &&
-                  String(f.Semana).trim() === String(semana).trim()
-                );
-
-                if (fila) {
-                  const edades = ['8','9','10','11','12','13','14','15','S/C'];
-                  let anyDetalle = false;
-                  const nombresColores = {
-                    'black': 'NEGRO', 'white': 'BLANCO', 'blue': 'AZUL',
-                    'green': 'VERDE', 'yellow': 'AMARILLO', 'brown': 'CAFE',
-                    'red': 'ROJO', 'purple': 'LILA'
-                  };
-
-                  edades.forEach(edadStr => {
-                    const val = fila[edadStr];
-                    if (val !== undefined && val !== null && String(val).trim() !== '' && Number(val) !== 0) {
-                      anyDetalle = true;
-                      if (edadStr === 'S/C') {
-                        const colorRect = document.createElement('span');
-                        colorRect.style.display = 'inline-block';
-                        colorRect.style.width = '14px';
-                        colorRect.style.height = '14px';
-                        colorRect.style.backgroundColor = 'transparent';
-                        colorRect.style.border = '1px solid #888';
-                        colorRect.style.color = '#fff';
-                        colorRect.style.fontWeight = 'bold';
-                        colorRect.style.fontSize = '12px';
-                        colorRect.style.lineHeight = '14px';
-                        colorRect.style.textAlign = 'center';
-                        colorRect.style.marginRight = '6px';
-                        colorRect.style.verticalAlign = 'middle';
-                        colorRect.style.userSelect = 'none';
-                        colorRect.textContent = 'X';
-                        colorRect.title = 'Sin Cinta';
-
-                        const colorNameSpan = document.createElement('span');
-                        colorNameSpan.textContent = 'S/C';
-                        colorNameSpan.style.color = '#fff';
-                        colorNameSpan.style.fontWeight = 'bold';
-                        colorNameSpan.style.marginRight = '8px';
-                        colorNameSpan.style.verticalAlign = 'middle';
-
-                        const scLine = document.createElement('div');
-                        scLine.style.color = '#ffffff';
-                        scLine.style.marginBottom = '3px';
-                        scLine.appendChild(colorRect);
-                        scLine.appendChild(colorNameSpan);
-                        scLine.append(`: ${val}`);
-                        container.appendChild(scLine);
-                      } else {
-                        const edadNum = Number(edadStr);
-                        const idxEdad = coloresBase.findIndex(c => c.edad === edadNum);
-                        const idxColor = (idxEdad - desplazamiento + coloresBase.length) % coloresBase.length;
-                        const colorAsignado = coloresBase[idxColor].color;
-                        const nombreColor = nombresColores[colorAsignado.toLowerCase()] || colorAsignado.toUpperCase();
-
-                        const colorRect = document.createElement('span');
-                        colorRect.style.display = 'inline-block';
-                        colorRect.style.width = '14px';
-                        colorRect.style.height = '14px';
-                        colorRect.style.backgroundColor = colorAsignado;
-                        colorRect.style.marginRight = '6px';
-                        colorRect.style.border = '1px solid #000';
-                        colorRect.style.verticalAlign = 'middle';
-                        colorRect.title = nombreColor;
-
-                        const colorNameSpan = document.createElement('span');
-                        colorNameSpan.textContent = `${nombreColor}`;
-                        colorNameSpan.style.color = '#fff';
-                        colorNameSpan.style.fontWeight = 'bold';
-                        colorNameSpan.style.marginRight = '8px';
-                        colorNameSpan.style.verticalAlign = 'middle';
-
-                        const edadLine = document.createElement('div');
-                        edadLine.style.color = '#ffffff';
-                        edadLine.style.marginBottom = '3px';
-                        edadLine.appendChild(colorRect);
-                        edadLine.appendChild(colorNameSpan);
-                        edadLine.append(`(${edadStr}): ${val}`);
-                        container.appendChild(edadLine);
-                      }
-                    }
-                  });
-
-                  if (!anyDetalle) {
-                    const noLine = document.createElement('div');
-                    noLine.style.color = '#ffffff';
-                    noLine.textContent = 'No hay detalles de edades';
-                    container.appendChild(noLine);
-                  }
-                } else {
-                  const noLine = document.createElement('div');
-                  noLine.style.color = '#ffffff';
-                  noLine.textContent = 'Detalles no disponibles';
-                  container.appendChild(noLine);
-                }
+                container.style.width = '400px';
+                container.style.height = '500px';
+                container.style.display = 'flex';
+                container.style.flexDirection = 'column';
+                container.style.justifyContent = 'center';
+                container.style.alignItems = 'center';
+                container.style.whiteSpace = 'normal';
+                container.style.overflow = 'hidden';
               }
-            } else {
-              container.textContent = `${datasetLabel}: ${value}`;
-              container.style.color = '#ffffff';
-              container.style.fontWeight = 'bold';
             }
 
             tooltipEl.appendChild(container);
@@ -604,6 +505,7 @@ function createCharts() {
     plugins: [ChartDataLabels]
   });
 
+  // ===== CAJAS =====
   cajasChart = new Chart(cajasCtx, {
     type: 'bar',
     data: { labels: [], datasets: [] },
@@ -631,65 +533,34 @@ function createCharts() {
   });
 }
 
+// ===================== UPDATE CHARTS COMPLETO =====================
 function updateCharts(data) {
   const semanas = data.map(row => row.Semana);
-  const racimosCosechados = data.map(row => +row['Racimos Cosechados'] || 0);
-  const racimosProcesados = data.map(row => +row['Procesados'] || 0);
-  const racimosRechazados = data.map(row => +row['Rechazados'] || 0);
-  racimosChart.data.labels = semanas;
-  const datasetsRacimos = [
-    {
-      label: 'Racimos Cosechados',
-      data: racimosCosechados,
-      backgroundColor: 'rgba(200,200,200,0.6)',
-      borderRadius: 8,
-      categoryPercentage: 1,
-      barPercentage: 0.8,
-    },
-    {
-      label: 'Procesados',
-      data: racimosProcesados,
-      backgroundColor: 'rgba(100,200,100,0.6)',
-      borderRadius: 8,
-      categoryPercentage: 1,
-      barPercentage: 0.8,
-    },
-    {
-      label: 'Rechazados',
-      data: racimosRechazados,
-      backgroundColor: 'rgba(255,99,132,0.6)',
-      borderRadius: 8,
-      categoryPercentage: 1,
-      barPercentage: 0.8,
-      datalabels: {
-        labels: {
-          cantidad: {
-            formatter: function (value) {
-              return value;
-            },
-            anchor: 'end',
-            align: 'right',
-            color: 'black',
-            font: { weight: 'bold', size: 12 }
-          },
-          porcentaje: {
-            formatter: function (value, context) {
-              const index = context.dataIndex;
-              const totalCosechados = racimosCosechados[index] || 1;
-              const porcentaje = ((value / totalCosechados) * 100).toFixed(2);
-              return ` (${porcentaje}%)`;
-            },
-            anchor: 'end',
-            align: 'right',
-            color: 'rgba(0,0,0,0.5)',
-            font: { weight: 'normal', size: 11 },
-            offset: 25
-          }
-        }
-      }
-    }];
+  const hacienda = haciendaSelector.value.toUpperCase();
 
-  datasetsRacimos.forEach((ds) => {
+  racimosChart.data.labels = semanas;
+
+  let racimosCosechados = data.map(row => +row['Racimos Cosechados'] || 0);
+  let racimosProcesados = data.map(row => +row['Procesados'] || 0);
+  let racimosRechazados = data.map(row => +row['Rechazados'] || 0);
+
+  // Ajuste de nombres si es CACAO
+  let labelCosechados = 'Racimos Cosechados';
+  let labelProcesados = 'Procesados';
+  let labelRechazados = 'Rechazados';
+  if (hacienda === 'CACAO') {
+    labelCosechados = 'Quintales Cosechados';
+    labelProcesados = 'Vendidos';
+    labelRechazados = 'Fallo';
+  }
+
+  const datasetsRacimos = [
+    { label: labelCosechados, data: racimosCosechados, backgroundColor: 'rgba(200,200,200,0.6)', borderRadius: 8, categoryPercentage: 1, barPercentage: 0.8 },
+    { label: labelProcesados, data: racimosProcesados, backgroundColor: 'rgba(100,200,100,0.6)', borderRadius: 8, categoryPercentage: 1, barPercentage: 0.8 },
+    { label: labelRechazados, data: racimosRechazados, backgroundColor: 'rgba(255,99,132,0.6)', borderRadius: 8, categoryPercentage: 1, barPercentage: 0.8 }
+  ];
+
+  datasetsRacimos.forEach(ds => {
     ds.hidden = visibilidadRacimos[ds.label] || false;
   });
 
@@ -704,6 +575,7 @@ function updateCharts(data) {
     racimosChart.update();
   };
 
+  // ===== CAJAS =====
   const cajasTotales = data.map(row => +row['Cajas'] || 0);
   const rathio = data.map(row => +row['Rathio'] || 0);
 
